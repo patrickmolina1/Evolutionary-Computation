@@ -8,8 +8,10 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
+
+
         try {
-            Instance instance = new Instance("src/TSPA.csv", "TSPB");
+            Instance instance = new Instance("./raw_data/TSPB.csv", "TSPB");
 
             // Create experiment runner
             ExperimentRunner runner = new ExperimentRunner();
