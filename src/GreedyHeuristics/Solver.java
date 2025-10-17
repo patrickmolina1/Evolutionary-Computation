@@ -149,6 +149,7 @@ public class Solver {
         }
 
         int totalDistance = 0;
+        // Compute the total distance of the cycle, including the edge from the last node back to the first (using modulo for wrap-around)
         for (int i = 0; i < order.size(); i++) {
             int from = order.get(i);
             int to = order.get((i + 1) % order.size());
