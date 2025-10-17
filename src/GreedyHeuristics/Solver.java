@@ -102,7 +102,6 @@ public class Solver {
 
     public Solution nearestNeighborAllPositions(Instance instance) {
         Random rand = new Random();
-
         List<Node> allNodes = new ArrayList<>(instance.nodes);
         Node startNode = allNodes.get(rand.nextInt(allNodes.size()));
 
@@ -123,9 +122,9 @@ public class Solver {
             int minIncrease = Integer.MAX_VALUE;
 
             for (Node candidate : remaining) {
-                for (int pos = 0; pos <= order.size(); pos++) {
-                    int prevNodeId = order.get((pos - 1 + order.size()) % order.size());
-                    int nextNodeId = order.get(pos % order.size());
+                for (int i = 0; i < order.size(); i++) {
+                    int prevNodeId = order.get(i);
+                    int nextNodeId = order.get((i + 1) % order.size());
 
                     int distPrevToNext = instance.distanceMatrix[prevNodeId][nextNodeId];
                     int distPrevToCandidate = instance.distanceMatrix[prevNodeId][candidate.id];
@@ -137,7 +136,7 @@ public class Solver {
                     if (objectiveIncrease < minIncrease) {
                         minIncrease = objectiveIncrease;
                         bestCandidate = candidate;
-                        bestPosition = pos;
+                        bestPosition = i + 1;
                     }
                 }
             }
@@ -149,8 +148,8 @@ public class Solver {
             }
         }
 
-        // Calculate total distance
         int totalDistance = 0;
+        // Compute the total distance of the cycle, including the edge from the last node back to the first (using modulo for wrap-around)
         for (int i = 0; i < order.size(); i++) {
             int from = order.get(i);
             int to = order.get((i + 1) % order.size());
@@ -162,6 +161,7 @@ public class Solver {
 
         return new Solution(selected, order, totalCost, totalDistance);
     }
+
 
 
     public Solution greedyCycle(Instance instance, Node startNode) {
