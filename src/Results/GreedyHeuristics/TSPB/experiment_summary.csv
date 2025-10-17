@@ -1,0 +1,5 @@
+Instance,Method,MinCost,MaxCost,AvgCost,NumSolutions,BestSolutionID
+TSPB,RandomSolution,191728,236268,212747.89,100,27
+TSPB,NearestNeighborEndOnly,65046,77312,70269.86,100,68
+TSPB,NearestNeighborAllPositions,49394,57140,51440.19,100,2
+TSPB,GreedyCycle,49001,57140,51154.03,100,75
