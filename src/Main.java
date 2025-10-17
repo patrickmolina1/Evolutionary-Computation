@@ -1,8 +1,9 @@
 
+import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
+import GreedyHeuristics.GreedyHeuristicsSolver;
+import Utilities.ExperimentRunner;
 import Utilities.*;
-import GreedyHeuristics.*;
 
-import java.io.IOException;
 import java.util.List;
 
 public class Main {
@@ -11,10 +12,10 @@ public class Main {
 
 
         try {
-            Instance instance = new Instance("./raw_data/TSPB.csv", "TSPB");
+            Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
 
             // Create experiment runner
-            ExperimentRunner runner = new ExperimentRunner();
+            GreedyHeuristicsExperimentRunner runner = new GreedyHeuristicsExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
