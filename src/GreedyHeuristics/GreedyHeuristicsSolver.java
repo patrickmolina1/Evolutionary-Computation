@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Random;
 
 
-public class Solver {
+public class GreedyHeuristicsSolver extends Solver {
 
-    public Solver(){
+    public GreedyHeuristicsSolver(){
 
     }
 
