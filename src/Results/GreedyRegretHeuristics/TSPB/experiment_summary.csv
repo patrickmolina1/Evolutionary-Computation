@@ -1,3 +1,0 @@
-Instance,Method,MinCost,MaxCost,AvgCost,NumSolutions,BestSolutionID
-TSPB,greedy2RegretNearest,67809,78406,72676.51,100,19
-TSPB,greedyWeightedRegret,47199,55700,51133.70,100,21
