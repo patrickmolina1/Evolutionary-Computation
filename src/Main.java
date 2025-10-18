@@ -1,6 +1,7 @@
 
 import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
 import GreedyHeuristics.GreedyHeuristicsSolver;
+import GreedyRegretHeuristics.GreedyRegretHeuristicsExperimentRunner;
 import Utilities.ExperimentRunner;
 import Utilities.*;
 
@@ -15,7 +16,7 @@ public class Main {
             Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
 
             // Create experiment runner
-            GreedyHeuristicsExperimentRunner runner = new GreedyHeuristicsExperimentRunner();
+            GreedyRegretHeuristicsExperimentRunner runner = new GreedyRegretHeuristicsExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
@@ -24,7 +25,7 @@ public class Main {
             // Export results to CSV
             System.out.println("Exporting results...");
             // ensure output directory exists
-            java.io.File outDir = new java.io.File("src/Results/" + instance.name);
+            java.io.File outDir = new java.io.File("src/Results/GreedyRegretHeuristics/" + instance.name);
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
