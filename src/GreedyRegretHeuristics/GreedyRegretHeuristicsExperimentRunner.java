@@ -21,9 +21,9 @@ public class GreedyRegretHeuristicsExperimentRunner extends ExperimentRunner imp
 
         // Test each method
         results.add(testMethod(instance, "greedy2RegretNearestNeighbor", numIterations));
-        results.add(testMethod(instance, "greedy2RegretGreedyCycle", numIterations));
-
         results.add(testMethod(instance, "greedyWeightedRegretNearestNeighbor", numIterations));
+
+        results.add(testMethod(instance, "greedy2RegretGreedyCycle", numIterations));
         results.add(testMethod(instance, "greedyWeightedRegretGreedyCycle", numIterations));
 
 
@@ -40,17 +40,17 @@ public class GreedyRegretHeuristicsExperimentRunner extends ExperimentRunner imp
 
             switch (methodName) {
                 case "greedy2RegretNearestNeighbor":
-                    solution = solver.greedy2RegretNearestNeighbor(instance, instance.nodes.get(i));
+                    solution = solver.greedy2RegretNearestNeighbor(instance);
                     break;
                 case "greedy2RegretGreedyCycle":
                     solution = solver.greedy2RegretGreedyCycle(instance, instance.nodes.get(i));
                     break;
                 case "greedyWeightedRegretNearestNeighbor":
-                    solution = solver.greedyWeightedRegretNearestNeighbor(instance, instance.nodes.get(i), 0.5, 0.5);
+                    solution = solver.greedyWeightedRegretNearestNeighbor(instance,0.5, 0.5);
                     break;
 
                 case "greedyWeightedRegretGreedyCycle":
-                    solution = solver.greedyWeightedRegretGreedyCycle(instance, instance.nodes.get(i), 0.5, 0.5);
+                    solution = solver.greedyWeightedRegretGreedyCycle(instance,instance.nodes.get(i),0.5,0.5);
                     break;
             }
 
