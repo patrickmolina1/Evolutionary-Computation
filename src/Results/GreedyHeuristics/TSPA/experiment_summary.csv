@@ -1,5 +1,5 @@
 Instance,Method,MinCost,MaxCost,AvgCost,NumSolutions,BestSolutionID
-TSPA,RandomSolution,232222,291123,264089.38,100,49
-TSPA,NearestNeighborEndOnly,91417,117672,105332.36,100,49
-TSPA,NearestNeighborAllPositions,71773,73894,72628.65,100,74
-TSPA,GreedyCycle,71488,74350,72572.07,100,62
+TSPA,RandomSolution,240175,305527,264793.07,100,54
+TSPA,NearestNeighborEndOnly,91550,120393,106009.57,100,28
+TSPA,NearestNeighborAllPositions,114558,116818,115711.30,100,38
+TSPA,GreedyCycle,71488,74119,72631.06,100,39
