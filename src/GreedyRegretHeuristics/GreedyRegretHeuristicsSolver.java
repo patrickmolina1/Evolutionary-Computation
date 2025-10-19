@@ -17,7 +17,67 @@ public class GreedyRegretHeuristicsSolver extends Solver {
 
     }
 
-    public Solution greedy2RegretNearest(Instance instance, Node startNode) {
+    public Solution greedy2RegretNearestNeighbor(Instance instance, Node startNode) {
+        List<Node> selected = new ArrayList<>();
+        List<Integer> order = new ArrayList<>();
+        selected.add(startNode);
+        order.add(startNode.id);
+
+        List<Node> remaining = new ArrayList<>(instance.nodes);
+        remaining.remove(startNode);
+
+        int n = instance.nodes.size();
+        int numToSelect = (int) Math.ceil(n / 2.0);
+
+        while (selected.size() < numToSelect && !remaining.isEmpty()) {
+            Node bestCandidate = null;
+            int maxRegret = Integer.MIN_VALUE;
+
+            for (Node candidate : remaining) {
+                Node lastNode = selected.get(selected.size() - 1);
+                Node firstNode = selected.get(0);
+
+                // Best increase: add at end
+                int distToCandidate = instance.distanceMatrix[lastNode.id][candidate.id];
+                int distCandidateToFirst = instance.distanceMatrix[candidate.id][firstNode.id];
+                int distLastToFirst = instance.distanceMatrix[lastNode.id][firstNode.id];
+                int bestIncrease = distToCandidate + distCandidateToFirst - distLastToFirst + candidate.cost;
+
+                // Second best: would be not adding it (infinite cost, so we use a proxy)
+                // For regret calculation, we consider the difference to the worst alternative
+                int secondBestIncrease = Integer.MAX_VALUE;
+
+                // Since we only have one position (end), we need to compare with other candidates
+                // The regret is how much worse it would be to add a different node instead
+                int regret = secondBestIncrease - bestIncrease;
+
+                if (regret > maxRegret) {
+                    maxRegret = regret;
+                    bestCandidate = candidate;
+                }
+            }
+
+            if (bestCandidate != null) {
+                selected.add(bestCandidate);
+                order.add(bestCandidate.id);
+                remaining.remove(bestCandidate);
+            }
+        }
+
+        int totalDistance = 0;
+        for (int i = 0; i < order.size(); i++) {
+            int from = order.get(i);
+            int to = order.get((i + 1) % order.size());
+            totalDistance += instance.distanceMatrix[from][to];
+        }
+
+        int totalNodeCost = selected.stream().mapToInt(node -> node.cost).sum();
+        int totalCost = totalDistance + totalNodeCost;
+
+        return new Solution(selected, order, totalCost, totalDistance);
+    }
+
+    public Solution greedy2RegretGreedyCycle(Instance instance, Node startNode) {
         List<Node> selected = new ArrayList<>();
         List<Integer> order = new ArrayList<>();
         selected.add(startNode);
@@ -88,7 +148,65 @@ public class GreedyRegretHeuristicsSolver extends Solver {
         return new Solution(selected, order, totalCost, totalDistance);
     }
 
-    public Solution greedyWeightedRegret(Instance instance, Node startNode, double weightRegret, double weightObjective) {
+
+    public Solution greedyWeightedRegretNearestNeighbor(Instance instance, Node startNode, double weightRegret, double weightObjective) {
+        List<Node> selected = new ArrayList<>();
+        List<Integer> order = new ArrayList<>();
+        selected.add(startNode);
+        order.add(startNode.id);
+
+        List<Node> remaining = new ArrayList<>(instance.nodes);
+        remaining.remove(startNode);
+
+        int n = instance.nodes.size();
+        int numToSelect = (int) Math.ceil(n / 2.0);
+
+        while (selected.size() < numToSelect && !remaining.isEmpty()) {
+            Node bestCandidate = null;
+            double maxWeightedScore = Double.NEGATIVE_INFINITY;
+
+            for (Node candidate : remaining) {
+                Node lastNode = selected.get(selected.size() - 1);
+                Node firstNode = selected.get(0);
+
+                int distToCandidate = instance.distanceMatrix[lastNode.id][candidate.id];
+                int distCandidateToFirst = instance.distanceMatrix[candidate.id][firstNode.id];
+                int distLastToFirst = instance.distanceMatrix[lastNode.id][firstNode.id];
+                int bestIncrease = distToCandidate + distCandidateToFirst - distLastToFirst + candidate.cost;
+
+                int secondBestIncrease = Integer.MAX_VALUE;
+                int regret = secondBestIncrease - bestIncrease;
+
+                double weightedScore = weightRegret * regret - weightObjective * bestIncrease;
+
+                if (weightedScore > maxWeightedScore) {
+                    maxWeightedScore = weightedScore;
+                    bestCandidate = candidate;
+                }
+            }
+
+            if (bestCandidate != null) {
+                selected.add(bestCandidate);
+                order.add(bestCandidate.id);
+                remaining.remove(bestCandidate);
+            }
+        }
+
+        int totalDistance = 0;
+        for (int i = 0; i < order.size(); i++) {
+            int from = order.get(i);
+            int to = order.get((i + 1) % order.size());
+            totalDistance += instance.distanceMatrix[from][to];
+        }
+
+        int totalNodeCost = selected.stream().mapToInt(node -> node.cost).sum();
+        int totalCost = totalDistance + totalNodeCost;
+
+        return new Solution(selected, order, totalCost, totalDistance);
+    }
+
+
+    public Solution greedyWeightedRegretGreedyCycle(Instance instance, Node startNode, double weightRegret, double weightObjective) {
         List<Node> selected = new ArrayList<>();
         List<Integer> order = new ArrayList<>();
         selected.add(startNode);

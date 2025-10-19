@@ -20,8 +20,11 @@ public class GreedyRegretHeuristicsExperimentRunner extends ExperimentRunner imp
         List<ExperimentResult> results = new ArrayList<>();
 
         // Test each method
-        results.add(testMethod(instance, "greedy2RegretNearest", numIterations));
-        results.add(testMethod(instance, "greedyWeightedRegret", numIterations));
+        results.add(testMethod(instance, "greedy2RegretNearestNeighbor", numIterations));
+        results.add(testMethod(instance, "greedy2RegretGreedyCycle", numIterations));
+
+        results.add(testMethod(instance, "greedyWeightedRegretNearestNeighbor", numIterations));
+        results.add(testMethod(instance, "greedyWeightedRegretGreedyCycle", numIterations));
 
 
         return results;
@@ -36,11 +39,18 @@ public class GreedyRegretHeuristicsExperimentRunner extends ExperimentRunner imp
             Solution solution = null;
 
             switch (methodName) {
-                case "greedy2RegretNearest":
-                    solution = solver.greedy2RegretNearest(instance, instance.nodes.get(i));
+                case "greedy2RegretNearestNeighbor":
+                    solution = solver.greedy2RegretNearestNeighbor(instance, instance.nodes.get(i));
                     break;
-                case "greedyWeightedRegret":
-                    solution = solver.greedyWeightedRegret(instance, instance.nodes.get(i), 0.5, 0.5);
+                case "greedy2RegretGreedyCycle":
+                    solution = solver.greedy2RegretGreedyCycle(instance, instance.nodes.get(i));
+                    break;
+                case "greedyWeightedRegretNearestNeighbor":
+                    solution = solver.greedyWeightedRegretNearestNeighbor(instance, instance.nodes.get(i), 0.5, 0.5);
+                    break;
+
+                case "greedyWeightedRegretGreedyCycle":
+                    solution = solver.greedyWeightedRegretGreedyCycle(instance, instance.nodes.get(i), 0.5, 0.5);
                     break;
             }
 
