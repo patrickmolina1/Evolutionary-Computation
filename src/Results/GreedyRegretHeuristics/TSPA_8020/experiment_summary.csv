@@ -1,3 +1,0 @@
-Instance,Method,MinCost,MaxCost,AvgCost,NumSolutions,BestSolutionID
-TSPA_8020,greedy2RegretNearest,107766,126860,115823.54,100,16
-TSPA_8020,greedyWeightedRegret,72128,77674,75553.42,100,1
