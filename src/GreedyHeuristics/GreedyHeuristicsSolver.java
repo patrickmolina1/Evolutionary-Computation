@@ -123,39 +123,64 @@ public class GreedyHeuristicsSolver extends Solver {
         int numToSelect = (int) Math.ceil(n / 2.0);
 
         while (selected.size() < numToSelect && !remaining.isEmpty()) {
-            Node bestCandidate = null;
-            int bestPosition = -1;
-            int minIncrease = Integer.MAX_VALUE;
+
+            // Find best unvisited node (considering distance AND cost) to add
+            Node bestCandidateToAdd = null;
+            int minSelectionMetric = Integer.MAX_VALUE;
 
             for (Node candidate : remaining) {
+                // 1. First, find the distance from this candidate to the *nearest* node in the tour
+                int minDistanceToTour = Integer.MAX_VALUE;
+                for (Node inTour : selected) {
+                    int distance = instance.distanceMatrix[inTour.id][candidate.id];
+                    if (distance < minDistanceToTour) {
+                        minDistanceToTour = distance;
+                    }
+                }
+
+                // 2. Create the new metric using both distance and cost
+                // This is the key change: we add the candidate's cost to the metric.
+                int selectionMetric = minDistanceToTour + candidate.cost;
+
+                // 3. Find the candidate that minimizes this new metric
+                if (selectionMetric < minSelectionMetric) {
+                    minSelectionMetric = selectionMetric;
+                    bestCandidateToAdd = candidate;
+                }
+            }
+
+
+            if (bestCandidateToAdd != null) {
+                int bestPosition = -1;
+                int minIncrease = Integer.MAX_VALUE;
+
                 for (int i = 0; i < order.size(); i++) {
                     int prevNodeId = order.get(i);
                     int nextNodeId = order.get((i + 1) % order.size());
 
                     int distPrevToNext = instance.distanceMatrix[prevNodeId][nextNodeId];
-                    int distPrevToCandidate = instance.distanceMatrix[prevNodeId][candidate.id];
-                    int distCandidateToNext = instance.distanceMatrix[candidate.id][nextNodeId];
+                    int distPrevToCandidate = instance.distanceMatrix[prevNodeId][bestCandidateToAdd.id];
+                    int distCandidateToNext = instance.distanceMatrix[bestCandidateToAdd.id][nextNodeId];
 
                     int distanceIncrease = distPrevToCandidate + distCandidateToNext - distPrevToNext;
-                    int objectiveIncrease = distanceIncrease + candidate.cost;
+
+                    int objectiveIncrease = distanceIncrease + bestCandidateToAdd.cost;
 
                     if (objectiveIncrease < minIncrease) {
                         minIncrease = objectiveIncrease;
-                        bestCandidate = candidate;
                         bestPosition = i + 1;
                     }
                 }
-            }
 
-            if (bestCandidate != null) {
-                selected.add(bestPosition, bestCandidate);
-                order.add(bestPosition, bestCandidate.id);
-                remaining.remove(bestCandidate);
+                selected.add(bestPosition, bestCandidateToAdd);
+                order.add(bestPosition, bestCandidateToAdd.id);
+                remaining.remove(bestCandidateToAdd);
+            } else {
+                break;
             }
         }
 
         int totalDistance = 0;
-        // Compute the total distance of the cycle, including the edge from the last node back to the first (using modulo for wrap-around)
         for (int i = 0; i < order.size(); i++) {
             int from = order.get(i);
             int to = order.get((i + 1) % order.size());
@@ -168,6 +193,7 @@ public class GreedyHeuristicsSolver extends Solver {
         int endTime = (int) System.currentTimeMillis();
         return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
+
 
 
 

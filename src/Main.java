@@ -16,7 +16,7 @@ public class Main {
             Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
 
             // Create experiment runner
-            GreedyHeuristicsExperimentRunner runner = new GreedyHeuristicsExperimentRunner();
+            GreedyRegretHeuristicsExperimentRunner runner = new GreedyRegretHeuristicsExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");

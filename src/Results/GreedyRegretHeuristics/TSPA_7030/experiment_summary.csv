@@ -1,0 +1,5 @@
+Instance,Method,MinCost,MaxCost,AvgCost,NumSolutions,BestSolutionID
+TSPA_7030,greedy2RegretNearestNeighbor,105692,121721,115538.55,100,37
+TSPA_7030,greedyWeightedRegretNearestNeighbor,70632,75365,73063.88,100,23
+TSPA_7030,greedy2RegretGreedyCycle,107766,126860,115823.54,100,16
+TSPA_7030,greedyWeightedRegretGreedyCycle,70605,75365,73138.26,100,90
