@@ -35,18 +35,19 @@ public class GreedyRegretHeuristicsExperimentRunner extends ExperimentRunner imp
         List<Solution> solutions = new ArrayList<>();
 
 
+
         for (int i = 0; i < numIterations; i++) {
             Solution solution = null;
-
+            int r = new Random().nextInt(instance.nodes.size());
             switch (methodName) {
                 case "greedy2RegretNearestNeighbor":
-                    solution = solver.greedy2RegretNearestNeighbor(instance);
+                    solution = solver.greedy2RegretNearestNeighbor(instance,instance.nodes.get(r));
                     break;
                 case "greedy2RegretGreedyCycle":
                     solution = solver.greedy2RegretGreedyCycle(instance, instance.nodes.get(i));
                     break;
                 case "greedyWeightedRegretNearestNeighbor":
-                    solution = solver.greedyWeightedRegretNearestNeighbor(instance,0.5, 0.5);
+                    solution = solver.greedyWeightedRegretNearestNeighbor(instance,instance.nodes.get(r), 0.5, 0.5);
                     break;
 
                 case "greedyWeightedRegretGreedyCycle":
