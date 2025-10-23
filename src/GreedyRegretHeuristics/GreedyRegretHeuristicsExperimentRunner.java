@@ -53,6 +53,8 @@ public class GreedyRegretHeuristicsExperimentRunner extends ExperimentRunner imp
         int minCost = Integer.MAX_VALUE;
         int maxCost = 0;
         int bestSolutionId = 0;
+        int minRunningTime = Integer.MAX_VALUE;
+        int maxRunningTime = 0;
 
         for (int i = 0; i < solutions.size(); i++) {
             int cost = solutions.get(i).totalCost;
@@ -63,9 +65,17 @@ public class GreedyRegretHeuristicsExperimentRunner extends ExperimentRunner imp
             if (cost > maxCost) {
                 maxCost = cost;
             }
+            int runningTime = solutions.get(i).totalRunningTime;
+            if (runningTime < minRunningTime) {
+                minRunningTime = runningTime;
+            }
+            if (runningTime > maxRunningTime) {
+                maxRunningTime = runningTime;
+            }
         }
 
         double avgCost = solutions.stream().mapToInt(s -> s.totalCost).average().orElse(0.0);
+        double avgRunningTime = solutions.stream().mapToInt(s -> s.totalRunningTime).average().orElse(0.0);
 
         return new ExperimentResult(
                 instance.name,
@@ -73,6 +83,9 @@ public class GreedyRegretHeuristicsExperimentRunner extends ExperimentRunner imp
                 minCost,
                 maxCost,
                 avgCost,
+                minRunningTime,
+                maxRunningTime,
+                avgRunningTime,
                 solutions.size(),
                 bestSolutionId,
                 solutions

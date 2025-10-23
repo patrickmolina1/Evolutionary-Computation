@@ -7,12 +7,14 @@ public class Solution {
     public List<Integer> cycle; // order of node IDs
     public int totalCost;
     public int totalDistance;
+    public int totalRunningTime;
 
-    public Solution(List<Node> selectedNodes, List<Integer> cycle, int totalCost, int totalDistance) {
+    public Solution(List<Node> selectedNodes, List<Integer> cycle, int totalCost, int totalDistance, int totalRunningTime) {
         this.selectedNodes = selectedNodes;
         this.cycle = cycle;
         this.totalCost = totalCost;
         this.totalDistance = totalDistance;
+        this.totalRunningTime = totalRunningTime;
     }
 
 }
