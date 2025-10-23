@@ -18,6 +18,7 @@ public class GreedyRegretHeuristicsSolver extends Solver {
     }
 
     public Solution greedy2RegretNearest(Instance instance, Node startNode) {
+        int startTime = (int) System.currentTimeMillis();
         List<Node> selected = new ArrayList<>();
         List<Integer> order = new ArrayList<>();
         selected.add(startNode);
@@ -85,10 +86,12 @@ public class GreedyRegretHeuristicsSolver extends Solver {
         int totalNodeCost = selected.stream().mapToInt(node -> node.cost).sum();
         int totalCost = totalDistance + totalNodeCost;
 
-        return new Solution(selected, order, totalCost, totalDistance);
+        int endTime = (int) System.currentTimeMillis();
+        return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
 
     public Solution greedyWeightedRegret(Instance instance, Node startNode, double weightRegret, double weightObjective) {
+        int startTime = (int) System.currentTimeMillis();
         List<Node> selected = new ArrayList<>();
         List<Integer> order = new ArrayList<>();
         selected.add(startNode);
@@ -157,7 +160,8 @@ public class GreedyRegretHeuristicsSolver extends Solver {
         int totalNodeCost = selected.stream().mapToInt(node -> node.cost).sum();
         int totalCost = totalDistance + totalNodeCost;
 
-        return new Solution(selected, order, totalCost, totalDistance);
+        int endTime = (int) System.currentTimeMillis();
+        return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
 
 

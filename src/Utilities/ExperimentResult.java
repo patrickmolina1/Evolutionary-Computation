@@ -8,12 +8,15 @@ public class ExperimentResult {
     public int minCost;
     public int maxCost;
     public double avgCost;
+    public int minRunningTime;
+    public int maxRunningTime;
+    public double avgRunningTime;
     public int numSolutions;
     public int bestSolutionId;
     public List<Solution> solutions;
 
     public ExperimentResult(String instanceName, String methodName,
-                            int minCost, int maxCost, double avgCost, int numSolutions,
+                            int minCost, int maxCost, double avgCost, int minRunningTime, int maxRunningTime, double avgRunningTime, int numSolutions,
                             int bestSolutionId, List<Solution> solutions) {
         this.instanceName = instanceName;
         this.methodName = methodName;
@@ -23,5 +26,8 @@ public class ExperimentResult {
         this.numSolutions = numSolutions;
         this.bestSolutionId = bestSolutionId;
         this.solutions = solutions;
+        this.minRunningTime = minRunningTime;
+        this.maxRunningTime = maxRunningTime;
+        this.avgRunningTime = avgRunningTime;
     }
 }

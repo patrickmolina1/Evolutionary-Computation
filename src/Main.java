@@ -16,7 +16,7 @@ public class Main {
             Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
 
             // Create experiment runner
-            GreedyRegretHeuristicsExperimentRunner runner = new GreedyRegretHeuristicsExperimentRunner();
+            GreedyHeuristicsExperimentRunner runner = new GreedyHeuristicsExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
@@ -25,7 +25,7 @@ public class Main {
             // Export results to CSV
             System.out.println("Exporting results...");
             // ensure output directory exists
-            java.io.File outDir = new java.io.File("src/Results/GreedyRegretHeuristics/" + instance.name);
+            java.io.File outDir = new java.io.File("src/Results/GreedyHeuristicsTEST/" + instance.name);
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
@@ -35,8 +35,8 @@ public class Main {
 
             // Print summary
             for (ExperimentResult result : results) {
-                System.out.printf("%s - Min: %d, Max: %d, Avg: %.2f\n",
-                        result.methodName, result.minCost, result.maxCost, result.avgCost);
+                System.out.printf("%s - Min: %d, Max: %d, Avg: %.2f, RunningTime: %.2f\n",
+                        result.methodName, result.minCost, result.maxCost, result.avgCost, result.avgRunningTime);
             }
 
         } catch (Exception e) {
