@@ -15,6 +15,7 @@ public class GreedyHeuristicsSolver extends Solver {
     }
 
     public Solution randomSolution(Instance instance) {
+        int startTime = (int) System.currentTimeMillis();
         Random rand = new Random();
         int n = instance.nodes.size();
         int numToSelect = (int) Math.ceil(n / 2.0);
@@ -37,10 +38,13 @@ public class GreedyHeuristicsSolver extends Solver {
         int totalNodeCost = selected.stream().mapToInt(nod -> nod.cost).sum();
         int totalCost = totalDistance + totalNodeCost;
 
-        return new Solution(selected, order, totalCost, totalDistance);
+        int endTime = (int) System.currentTimeMillis();
+        return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
 
     public Solution nearestNeighborEndOnly(Instance instance) {
+
+        int startTime = (int) System.currentTimeMillis();
         Random rand = new Random();
 
         List<Node> allNodes = new ArrayList<>(instance.nodes);
@@ -96,11 +100,13 @@ public class GreedyHeuristicsSolver extends Solver {
         int totalNodeCost = selected.stream().mapToInt(node -> node.cost).sum();
         int totalCost = totalDistance + totalNodeCost;
 
-        return new Solution(selected, order, totalCost, totalDistance);
+        int endTime = (int) System.currentTimeMillis();
+        return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
 
 
     public Solution nearestNeighborAllPositions(Instance instance) {
+        int startTime = (int) System.currentTimeMillis();
         Random rand = new Random();
         List<Node> allNodes = new ArrayList<>(instance.nodes);
         Node startNode = allNodes.get(rand.nextInt(allNodes.size()));
@@ -184,13 +190,15 @@ public class GreedyHeuristicsSolver extends Solver {
         int totalNodeCost = selected.stream().mapToInt(node -> node.cost).sum();
         int totalCost = totalDistance + totalNodeCost;
 
-        return new Solution(selected, order, totalCost, totalDistance);
+        int endTime = (int) System.currentTimeMillis();
+        return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
 
 
 
 
     public Solution greedyCycle(Instance instance, Node startNode) {
+        int startTime = (int) System.currentTimeMillis();
         List<Node> selected = new ArrayList<>();
         List<Integer> order = new ArrayList<>();
         selected.add(startNode);
@@ -245,7 +253,8 @@ public class GreedyHeuristicsSolver extends Solver {
         int totalNodeCost = selected.stream().mapToInt(node -> node.cost).sum();
         int totalCost = totalDistance + totalNodeCost;
 
-        return new Solution(selected, order, totalCost, totalDistance);
+        int endTime = (int) System.currentTimeMillis();
+        return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
 
     public List<Solution> generateSolutions(Instance instance) {

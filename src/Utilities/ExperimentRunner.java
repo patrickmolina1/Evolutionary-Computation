@@ -29,16 +29,19 @@ public abstract class ExperimentRunner {
     private void exportSummaryCSV(List<ExperimentResult> results, String filename) throws IOException {
         try (FileWriter writer = new FileWriter(filename)) {
             // Write header
-            writer.append("Instance,Method,MinCost,MaxCost,AvgCost,NumSolutions,BestSolutionID\n");
+            writer.append("Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID\n");
 
             // Write data
             for (ExperimentResult result : results) {
-                writer.append(String.format("%s,%s,%d,%d,%.2f,%d,%d\n",
+                writer.append(String.format("%s,%s,%d,%d,%.2f,%d,%d,%.2f,%d,%d\n",
                         result.instanceName,
                         result.methodName,
                         result.minCost,
                         result.maxCost,
                         result.avgCost,
+                        result.minRunningTime,
+                        result.maxRunningTime,
+                        result.avgRunningTime,
                         result.numSolutions,
                         result.bestSolutionId));
             }
@@ -48,7 +51,7 @@ public abstract class ExperimentRunner {
     private void exportSolutionsCSV(ExperimentResult result, String filename) throws IOException {
         try (FileWriter writer = new FileWriter(filename)) {
             // Write header
-            writer.append("SolutionID,TotalCost,NumNodes,TotalDistance,ObjectiveFunction,Cycle\n");
+            writer.append("SolutionID,TotalCost,NumNodes,TotalDistance,ObjectiveFunction,TotalRunningTime,Cycle\n");
 
             // Write each solution
             for (int i = 0; i < result.solutions.size(); i++) {
@@ -62,12 +65,13 @@ public abstract class ExperimentRunner {
                         .replace("]", "")
                         .replace(", ", "-");
 
-                writer.append(String.format("%d,%d,%d,%d,%d,\"%s\"\n",
+                writer.append(String.format("%d,%d,%d,%d,%d,%d,\"%s\"\n",
                         i + 1,
                         sol.totalCost,
                         sol.selectedNodes.size(),
                         sol.totalDistance,
                         objectiveFunction,
+                        sol.totalRunningTime,
                         cycleStr));
             }
         }
