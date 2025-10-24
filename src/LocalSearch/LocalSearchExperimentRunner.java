@@ -30,10 +30,7 @@ public class LocalSearchExperimentRunner extends ExperimentRunner implements Exp
         results.add(testMethod(instance, "SteepestLS_GreedyStart_NodeExchange", numIterations));
         results.add(testMethod(instance, "SteepestLS_GreedyStart_EdgeExchange", numIterations));
 
-
-
-
-        return null;
+        return results;
     }
 
     @Override
