@@ -14,7 +14,7 @@ public class Main {
 
 
         try {
-            Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
+            Instance instance = new Instance("./raw_data/TSPB.csv", "TSPB");
 
             // Create experiment runner
 

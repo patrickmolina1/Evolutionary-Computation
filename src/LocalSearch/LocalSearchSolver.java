@@ -4,6 +4,8 @@ import GreedyRegretHeuristics.GreedyRegretHeuristicsSolver;
 import Utilities.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class LocalSearchSolver extends Solver {
 
@@ -18,10 +20,8 @@ public class LocalSearchSolver extends Solver {
     public Solution greedyLocalSearch(Instance instance, StartingSolutionType startingSolutionType, IntraRouteMoveType intraRouteMoveType){
         int startTime = (int) System.currentTimeMillis();
 
-        // Generate starting solution
         Solution currentSolution = generateStartingSolution(instance, startingSolutionType);
 
-        // Make copies of the solution data
         List<Node> selectedNodes = new ArrayList<>(currentSolution.selectedNodes);
         List<Integer> cycle = new ArrayList<>(currentSolution.cycle);
         Set<Integer> selectedIds = new HashSet<>();
@@ -35,61 +35,114 @@ public class LocalSearchSolver extends Solver {
         while (improved) {
             improved = false;
 
-            // Create randomized list of move types (intra-route and inter-route)
-            List<String> moveTypes = Arrays.asList("INTRA", "INTER");
-            Collections.shuffle(moveTypes, random);
+            boolean tryIntraFirst = random.nextBoolean();
 
-            for (String moveType : moveTypes) {
-                if (improved) break;
+            if (tryIntraFirst) {
+                improved = tryIntraRouteMove(instance, cycle, intraRouteMoveType);
+                if (improved) {
+                    // Recalculate costs after intra move
+                    currentDistance = calculateTotalDistance(instance, cycle);
+                    int totalNodeCost = selectedNodes.stream().mapToInt(n -> n.cost).sum();
+                    currentCost = currentDistance + totalNodeCost;
+                    continue;
+                }
+            }
 
-                if (moveType.equals("INTRA")) {
-                    // Intra-route moves (node or edge exchange)
-                    List<int[]> intraMoves = generateIntraMoves(cycle.size(), intraRouteMoveType);
-                    Collections.shuffle(intraMoves, random);
+            // Try inter-route move if intra didn't improve (or wasn't tried first)
+            MoveResult interResult = tryInterRouteMove(instance, cycle, selectedNodes, selectedIds);
+            if (interResult.improved) {
+                improved = true;
+                currentDistance += interResult.distanceDelta;
+                currentCost += interResult.totalDelta;
+                continue;
+            }
 
-                    for (int[] move : intraMoves) {
-                        int delta = calculateIntraDelta(instance, cycle, move, intraRouteMoveType);
-
-                        if (delta < 0) {
-                            // Apply the move
-                            applyIntraMove(cycle, move, intraRouteMoveType);
-                            currentDistance += delta;
-                            currentCost += delta;
-                            improved = true;
-                            break;
-                        }
-                    }
-                } else {
-                    // Inter-route moves (exchange selected and non-selected nodes)
-                    List<int[]> interMoves = generateInterMoves(instance, selectedIds);
-                    Collections.shuffle(interMoves, random);
-
-                    for (int[] move : interMoves) {
-                        int selectedNodeId = move[0];
-                        int nonSelectedNodeId = move[1];
-
-                        int delta = calculateInterDelta(instance, cycle, selectedNodes, selectedNodeId, nonSelectedNodeId);
-
-                        if (delta < 0) {
-                            // Apply the move
-                            applyInterMove(instance, selectedNodes, cycle, selectedIds, selectedNodeId, nonSelectedNodeId);
-
-                            // Update costs
-                            int newDistance = calculateTotalDistance(instance, cycle);
-                            int newNodeCost = selectedNodes.stream().mapToInt(n -> n.cost).sum();
-                            currentDistance = newDistance;
-                            currentCost = newDistance + newNodeCost;
-                            improved = true;
-                            break;
-                        }
-                    }
+            // If we tried intra first and it didn't work, don't try it again
+            // If we tried inter first, now try intra
+            if (!tryIntraFirst) {
+                improved = tryIntraRouteMove(instance, cycle, intraRouteMoveType);
+                if (improved) {
+                    currentDistance = calculateTotalDistance(instance, cycle);
+                    int totalNodeCost = selectedNodes.stream().mapToInt(n -> n.cost).sum();
+                    currentCost = currentDistance + totalNodeCost;
                 }
             }
         }
 
         int endTime = (int) System.currentTimeMillis();
-        int totalNodeCost = selectedNodes.stream().mapToInt(n -> n.cost).sum();
         return new Solution(selectedNodes, cycle, currentCost, currentDistance, endTime - startTime);
+    }
+
+    private boolean tryIntraRouteMove(Instance instance, List<Integer> cycle, IntraRouteMoveType intraRouteMoveType) {
+        // Generate randomized positions
+        List<Integer> positions = IntStream.range(0, cycle.size())
+                .boxed()
+                .collect(Collectors.toList());
+        Collections.shuffle(positions, random);
+
+        // Try moves in random order, stop at first improvement
+        for (int i = 0; i < positions.size(); i++) {
+            int pos1 = positions.get(i);
+
+            for (int j = i + 1; j < positions.size(); j++) {
+                int pos2 = positions.get(j);
+
+                // Ensure pos1 < pos2 for consistency
+                if (pos1 > pos2) {
+                    int temp = pos1;
+                    pos1 = pos2;
+                    pos2 = temp;
+                }
+
+                // For edge exchange, skip if not valid
+                if (intraRouteMoveType == IntraRouteMoveType.EDGE_EXCHANGE) {
+                    if (pos2 - pos1 < 2) continue;
+                    if (pos1 == 0 && pos2 == cycle.size() - 1) continue;
+                }
+
+                int[] move = new int[]{pos1, pos2};
+                int delta = calculateIntraDelta(instance, cycle, move, intraRouteMoveType);
+
+                if (delta < 0) {
+                    applyIntraMove(cycle, move, intraRouteMoveType);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private MoveResult tryInterRouteMove(Instance instance, List<Integer> cycle,
+                                         List<Node> selectedNodes, Set<Integer> selectedIds) {
+        // Create randomized list of selected nodes
+        List<Integer> selectedList = new ArrayList<>(selectedIds);
+        Collections.shuffle(selectedList, random);
+
+        // Create randomized list of non-selected nodes
+        List<Integer> nonSelectedList = new ArrayList<>();
+        for (Node node : instance.nodes) {
+            if (!selectedIds.contains(node.id)) {
+                nonSelectedList.add(node.id);
+            }
+        }
+        Collections.shuffle(nonSelectedList, random);
+
+        // Try moves in random order
+        for (int selectedNodeId : selectedList) {
+            for (int nonSelectedNodeId : nonSelectedList) {
+                DeltaResult deltaResult = calculateInterDeltaDetailed(instance, cycle, selectedNodes,
+                        selectedNodeId, nonSelectedNodeId);
+
+                if (deltaResult.totalDelta < 0) {
+                    // Apply the move
+                    applyInterMove(instance, selectedNodes, cycle, selectedIds, selectedNodeId, nonSelectedNodeId);
+                    return new MoveResult(true, deltaResult.totalDelta, deltaResult.distanceDelta);
+                }
+            }
+        }
+
+        return new MoveResult(false, 0, 0);
     }
 
     public Solution steepestLocalSearch(Instance instance, StartingSolutionType startingSolutionType, IntraRouteMoveType intraRouteMoveType){
@@ -115,6 +168,7 @@ public class LocalSearchSolver extends Solver {
             int bestDelta = 0;
             String bestMoveType = null;
             int[] bestMove = null;
+            int bestDistanceDelta = 0;
 
             // Evaluate all intra-route moves
             List<int[]> intraMoves = generateIntraMoves(cycle.size(), intraRouteMoveType);
@@ -133,9 +187,11 @@ public class LocalSearchSolver extends Solver {
                 int selectedNodeId = move[0];
                 int nonSelectedNodeId = move[1];
 
-                int delta = calculateInterDelta(instance, cycle, selectedNodes, selectedNodeId, nonSelectedNodeId);
-                if (delta < bestDelta) {
-                    bestDelta = delta;
+                DeltaResult deltaResult = calculateInterDeltaDetailed(instance, cycle, selectedNodes,
+                        selectedNodeId, nonSelectedNodeId);
+                if (deltaResult.totalDelta < bestDelta) {
+                    bestDelta = deltaResult.totalDelta;
+                    bestDistanceDelta = deltaResult.distanceDelta;
                     bestMoveType = "INTER";
                     bestMove = move;
                 }
@@ -154,17 +210,13 @@ public class LocalSearchSolver extends Solver {
                     int nonSelectedNodeId = bestMove[1];
                     applyInterMove(instance, selectedNodes, cycle, selectedIds, selectedNodeId, nonSelectedNodeId);
 
-                    // Recalculate costs
-                    int newDistance = calculateTotalDistance(instance, cycle);
-                    int newNodeCost = selectedNodes.stream().mapToInt(n -> n.cost).sum();
-                    currentDistance = newDistance;
-                    currentCost = newDistance + newNodeCost;
+                    currentDistance += bestDistanceDelta;
+                    currentCost += bestDelta;
                 }
             }
         }
 
         int endTime = (int) System.currentTimeMillis();
-        int totalNodeCost = selectedNodes.stream().mapToInt(n -> n.cost).sum();
         return new Solution(selectedNodes, cycle, currentCost, currentDistance, endTime - startTime);
     }
 
@@ -262,34 +314,34 @@ public class LocalSearchSolver extends Solver {
             if ((pos1 + 1) % n == pos2) {
                 // node1 -> node2 -> next2
                 int oldCost = instance.distanceMatrix[prev1][node1] +
-                             instance.distanceMatrix[node1][node2] +
-                             instance.distanceMatrix[node2][next2];
+                        instance.distanceMatrix[node1][node2] +
+                        instance.distanceMatrix[node2][next2];
                 int newCost = instance.distanceMatrix[prev1][node2] +
-                             instance.distanceMatrix[node2][node1] +
-                             instance.distanceMatrix[node1][next2];
+                        instance.distanceMatrix[node2][node1] +
+                        instance.distanceMatrix[node1][next2];
                 return newCost - oldCost;
             } else {
                 // node2 -> node1 -> next1
                 int oldCost = instance.distanceMatrix[prev2][node2] +
-                             instance.distanceMatrix[node2][node1] +
-                             instance.distanceMatrix[node1][next1];
+                        instance.distanceMatrix[node2][node1] +
+                        instance.distanceMatrix[node1][next1];
                 int newCost = instance.distanceMatrix[prev2][node1] +
-                             instance.distanceMatrix[node1][node2] +
-                             instance.distanceMatrix[node2][next1];
+                        instance.distanceMatrix[node1][node2] +
+                        instance.distanceMatrix[node2][next1];
                 return newCost - oldCost;
             }
         }
 
         // Non-adjacent nodes
         int oldCost = instance.distanceMatrix[prev1][node1] +
-                     instance.distanceMatrix[node1][next1] +
-                     instance.distanceMatrix[prev2][node2] +
-                     instance.distanceMatrix[node2][next2];
+                instance.distanceMatrix[node1][next1] +
+                instance.distanceMatrix[prev2][node2] +
+                instance.distanceMatrix[node2][next2];
 
         int newCost = instance.distanceMatrix[prev1][node2] +
-                     instance.distanceMatrix[node2][next1] +
-                     instance.distanceMatrix[prev2][node1] +
-                     instance.distanceMatrix[node1][next2];
+                instance.distanceMatrix[node2][next1] +
+                instance.distanceMatrix[prev2][node1] +
+                instance.distanceMatrix[node1][next2];
 
         return newCost - oldCost;
     }
@@ -311,11 +363,11 @@ public class LocalSearchSolver extends Solver {
         return newCost - oldCost;
     }
 
-    private int calculateInterDelta(Instance instance, List<Integer> cycle, List<Node> selectedNodes,
-                                    int selectedNodeId, int nonSelectedNodeId) {
+    private DeltaResult calculateInterDeltaDetailed(Instance instance, List<Integer> cycle, List<Node> selectedNodes,
+                                                    int selectedNodeId, int nonSelectedNodeId) {
         // Find position of selected node in cycle
         int pos = cycle.indexOf(selectedNodeId);
-        if (pos == -1) return Integer.MAX_VALUE;
+        if (pos == -1) return new DeltaResult(Integer.MAX_VALUE, 0);
 
         int n = cycle.size();
         int prev = cycle.get((pos - 1 + n) % n);
@@ -337,7 +389,9 @@ public class LocalSearchSolver extends Solver {
             }
         }
 
-        if (selectedNode == null || nonSelectedNode == null) return Integer.MAX_VALUE;
+        if (selectedNode == null || nonSelectedNode == null) {
+            return new DeltaResult(Integer.MAX_VALUE, 0);
+        }
 
         int costDelta = nonSelectedNode.cost - selectedNode.cost;
 
@@ -346,7 +400,7 @@ public class LocalSearchSolver extends Solver {
         int newDistance = instance.distanceMatrix[prev][nonSelectedNodeId] + instance.distanceMatrix[nonSelectedNodeId][next];
         int distanceDelta = newDistance - oldDistance;
 
-        return costDelta + distanceDelta;
+        return new DeltaResult(costDelta + distanceDelta, distanceDelta);
     }
 
     private void applyIntraMove(List<Integer> cycle, int[] move, IntraRouteMoveType moveType) {
@@ -380,7 +434,7 @@ public class LocalSearchSolver extends Solver {
     }
 
     private void applyInterMove(Instance instance, List<Node> selectedNodes, List<Integer> cycle,
-                               Set<Integer> selectedIds, int selectedNodeId, int nonSelectedNodeId) {
+                                Set<Integer> selectedIds, int selectedNodeId, int nonSelectedNodeId) {
         // Find position in cycle
         int pos = cycle.indexOf(selectedNodeId);
 
@@ -388,18 +442,16 @@ public class LocalSearchSolver extends Solver {
         cycle.set(pos, nonSelectedNodeId);
 
         // Update selected nodes list
-        Node selectedNode = null;
         Node nonSelectedNode = null;
+        for (Node node : instance.nodes) {
+            if (node.id == nonSelectedNodeId) {
+                nonSelectedNode = node;
+                break;
+            }
+        }
 
         for (int i = 0; i < selectedNodes.size(); i++) {
             if (selectedNodes.get(i).id == selectedNodeId) {
-                selectedNode = selectedNodes.get(i);
-                for (Node node : instance.nodes) {
-                    if (node.id == nonSelectedNodeId) {
-                        nonSelectedNode = node;
-                        break;
-                    }
-                }
                 selectedNodes.set(i, nonSelectedNode);
                 break;
             }
@@ -418,5 +470,28 @@ public class LocalSearchSolver extends Solver {
             totalDistance += instance.distanceMatrix[from][to];
         }
         return totalDistance;
+    }
+
+    // Helper classes for return values
+    private static class MoveResult {
+        boolean improved;
+        int totalDelta;
+        int distanceDelta;
+
+        MoveResult(boolean improved, int totalDelta, int distanceDelta) {
+            this.improved = improved;
+            this.totalDelta = totalDelta;
+            this.distanceDelta = distanceDelta;
+        }
+    }
+
+    private static class DeltaResult {
+        int totalDelta;
+        int distanceDelta;
+
+        DeltaResult(int totalDelta, int distanceDelta) {
+            this.totalDelta = totalDelta;
+            this.distanceDelta = distanceDelta;
+        }
     }
 }
