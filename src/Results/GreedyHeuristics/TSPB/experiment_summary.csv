@@ -1,5 +1,5 @@
-Instance,Method,MinCost,MaxCost,AvgCost,NumSolutions,BestSolutionID
-TSPB,RandomSolution,187273,232176,213101.02,100,19
-TSPB,NearestNeighborEndOnly,64148,77453,69634.67,100,2
-TSPB,NearestNeighborAllPositions,64750,71248,68183.91,100,67
-TSPB,GreedyCycle,49001,57140,51454.62,100,10
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
+TSPB,RandomSolution,191803,235581,213914.41,0,4,0.07,200,199
+TSPB,NearestNeighborEndOnly,62606,77415,69828.78,0,3,0.30,200,2
+TSPB,NearestNeighborAllPositions,47295,51030,48994.88,0,13,2.08,200,123
+TSPB,GreedyCycle,49001,57324,51532.22,1,23,2.37,200,188
