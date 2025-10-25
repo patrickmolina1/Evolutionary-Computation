@@ -1,0 +1,9 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
+TSPA,GreedyLS_RandomStart_NodeExchange,85045,103817,93245.75,10,72,20.27,200,99
+TSPA,GreedyLS_RandomStart_EdgeExchange,74582,86199,78703.19,10,54,24.78,200,136
+TSPA,GreedyLS_GreedyStart_NodeExchange,70379,72931,71684.54,3,32,5.56,200,72
+TSPA,GreedyLS_GreedyStart_EdgeExchange,70484,72816,71664.42,3,9,5.02,200,13
+TSPA,SteepestLS_RandomStart_NodeExchange,79789,97542,88108.59,190,419,257.92,200,1
+TSPA,SteepestLS_RandomStart_EdgeExchange,71587,77720,74038.50,177,347,222.91,200,101
+TSPA,SteepestLS_GreedyStart_NodeExchange,70137,72931,71402.91,0,31,10.39,200,148
+TSPA,SteepestLS_GreedyStart_EdgeExchange,69986,72711,71261.04,0,34,13.29,200,48
