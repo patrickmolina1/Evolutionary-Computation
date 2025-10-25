@@ -1,5 +1,0 @@
-Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
-TSPB,greedy2RegretNearestNeighbor,68864,76941,72761.18,2,28,3.11,200,29
-TSPB,greedyWeightedRegretNearestNeighbor,47199,55700,50821.22,2,23,2.70,200,99
-TSPB,greedy2RegretGreedyCycle,67658,77816,72817.32,1,23,2.94,200,146
-TSPB,greedyWeightedRegretGreedyCycle,47609,54296,50278.91,2,23,2.91,200,115
