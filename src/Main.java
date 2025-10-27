@@ -2,6 +2,7 @@
 import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
 import GreedyHeuristics.GreedyHeuristicsSolver;
 import GreedyRegretHeuristics.GreedyRegretHeuristicsExperimentRunner;
+import LocalSearch.LocalSearchExperimentRunner;
 import Utilities.ExperimentRunner;
 import Utilities.*;
 
@@ -13,19 +14,22 @@ public class Main {
 
 
         try {
-            Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
+            Instance instance = new Instance("./raw_data/TSPB.csv", "TSPB");
 
             // Create experiment runner
-            GreedyRegretHeuristicsExperimentRunner runner = new GreedyRegretHeuristicsExperimentRunner();
+
+            long startTime = System.currentTimeMillis();
+
+            LocalSearchExperimentRunner runner = new LocalSearchExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
-            List<ExperimentResult> results = runner.runExperiments(instance, 100);
+            List<ExperimentResult> results = runner.runExperiments(instance, 200);
 
             // Export results to CSV
             System.out.println("Exporting results...");
             // ensure output directory exists
-            java.io.File outDir = new java.io.File("src/Results/GreedyHeuristicsTEST/" + instance.name);
+            java.io.File outDir = new java.io.File("src/Results/LocalSearch/" + instance.name);
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
@@ -38,7 +42,8 @@ public class Main {
                 System.out.printf("%s - Min: %d, Max: %d, Avg: %.2f, RunningTime: %.2f\n",
                         result.methodName, result.minCost, result.maxCost, result.avgCost, result.avgRunningTime);
             }
-
+            long endTime = System.currentTimeMillis();
+            System.out.println("Total Execution Time: " + (endTime - startTime));
         } catch (Exception e) {
             e.printStackTrace();
         }

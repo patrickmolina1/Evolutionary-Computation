@@ -1,0 +1,9 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
+TSPB,GreedyLS_RandomStart_NodeExchange,57233,72381,64808.90,8,96,18.02,200,189
+TSPB,GreedyLS_RandomStart_EdgeExchange,48019,55971,51576.83,7,31,15.25,200,166
+TSPB,GreedyLS_GreedyStart_NodeExchange,47460,52997,50045.73,4,33,6.19,200,43
+TSPB,GreedyLS_GreedyStart_EdgeExchange,47140,52807,49901.09,4,14,5.91,200,5
+TSPB,SteepestLS_RandomStart_NodeExchange,55969,71020,62995.08,183,425,266.45,200,125
+TSPB,SteepestLS_RandomStart_EdgeExchange,45719,51098,48372.30,176,376,228.37,200,69
+TSPB,SteepestLS_GreedyStart_NodeExchange,46958,52730,49844.92,0,39,19.35,200,2
+TSPB,SteepestLS_GreedyStart_EdgeExchange,46904,51560,48975.24,0,59,24.10,200,145
