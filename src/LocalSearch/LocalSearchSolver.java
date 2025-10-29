@@ -230,7 +230,7 @@ public class LocalSearchSolver extends Solver {
         }
     }
 
-    private Solution generateRandomSolution(Instance instance) {
+    protected Solution generateRandomSolution(Instance instance) {
         int n = instance.nodes.size();
         int numToSelect = (int) Math.ceil(n / 2.0);
 
@@ -286,7 +286,7 @@ public class LocalSearchSolver extends Solver {
         return moves;
     }
 
-    private int calculateIntraDelta(Instance instance, List<Integer> cycle, int[] move, IntraRouteMoveType moveType) {
+    protected int calculateIntraDelta(Instance instance, List<Integer> cycle, int[] move, IntraRouteMoveType moveType) {
         int i = move[0];
         int j = move[1];
 
@@ -297,7 +297,7 @@ public class LocalSearchSolver extends Solver {
         }
     }
 
-    private int calculateNodeExchangeDelta(Instance instance, List<Integer> cycle, int pos1, int pos2) {
+    protected int calculateNodeExchangeDelta(Instance instance, List<Integer> cycle, int pos1, int pos2) {
         int n = cycle.size();
 
         int node1 = cycle.get(pos1);
@@ -346,7 +346,7 @@ public class LocalSearchSolver extends Solver {
         return newCost - oldCost;
     }
 
-    private int calculateEdgeExchangeDelta(Instance instance, List<Integer> cycle, int i, int j) {
+    protected int calculateEdgeExchangeDelta(Instance instance, List<Integer> cycle, int i, int j) {
         // Edge exchange (2-opt): reverse the segment between positions i and j
         int n = cycle.size();
 
@@ -363,7 +363,7 @@ public class LocalSearchSolver extends Solver {
         return newCost - oldCost;
     }
 
-    private DeltaResult calculateInterDeltaDetailed(Instance instance, List<Integer> cycle, List<Node> selectedNodes,
+    protected DeltaResult calculateInterDeltaDetailed(Instance instance, List<Integer> cycle, List<Node> selectedNodes,
                                                     int selectedNodeId, int nonSelectedNodeId) {
         // Find position of selected node in cycle
         int pos = cycle.indexOf(selectedNodeId);
@@ -403,7 +403,7 @@ public class LocalSearchSolver extends Solver {
         return new DeltaResult(costDelta + distanceDelta, distanceDelta);
     }
 
-    private void applyIntraMove(List<Integer> cycle, int[] move, IntraRouteMoveType moveType) {
+    protected void applyIntraMove(List<Integer> cycle, int[] move, IntraRouteMoveType moveType) {
         int i = move[0];
         int j = move[1];
 
@@ -433,7 +433,7 @@ public class LocalSearchSolver extends Solver {
         }
     }
 
-    private void applyInterMove(Instance instance, List<Node> selectedNodes, List<Integer> cycle,
+    protected void applyInterMove(Instance instance, List<Node> selectedNodes, List<Integer> cycle,
                                 Set<Integer> selectedIds, int selectedNodeId, int nonSelectedNodeId) {
         // Find position in cycle
         int pos = cycle.indexOf(selectedNodeId);
@@ -462,7 +462,7 @@ public class LocalSearchSolver extends Solver {
         selectedIds.add(nonSelectedNodeId);
     }
 
-    private int calculateTotalDistance(Instance instance, List<Integer> cycle) {
+    protected int calculateTotalDistance(Instance instance, List<Integer> cycle) {
         int totalDistance = 0;
         for (int i = 0; i < cycle.size(); i++) {
             int from = cycle.get(i);
@@ -472,26 +472,7 @@ public class LocalSearchSolver extends Solver {
         return totalDistance;
     }
 
-    // Helper classes for return values
-    private static class MoveResult {
-        boolean improved;
-        int totalDelta;
-        int distanceDelta;
 
-        MoveResult(boolean improved, int totalDelta, int distanceDelta) {
-            this.improved = improved;
-            this.totalDelta = totalDelta;
-            this.distanceDelta = distanceDelta;
-        }
-    }
 
-    private static class DeltaResult {
-        int totalDelta;
-        int distanceDelta;
 
-        DeltaResult(int totalDelta, int distanceDelta) {
-            this.totalDelta = totalDelta;
-            this.distanceDelta = distanceDelta;
-        }
-    }
 }

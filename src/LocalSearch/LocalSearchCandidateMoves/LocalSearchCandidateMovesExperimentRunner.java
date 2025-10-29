@@ -1,12 +1,6 @@
-package LocalSearchCandidateMoves;
-
-import LocalSearch.IntraRouteMoveType;
-import LocalSearch.StartingSolutionType;
+package LocalSearch.LocalSearchCandidateMoves;
 import Utilities.*;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class LocalSearchCandidateMovesExperimentRunner extends ExperimentRunner implements ExperimentRunnerInterface {
     public LocalSearchCandidateMovesSolver solver;

@@ -1,4 +1,4 @@
-package LocalSearchCandidateMoves;
+package LocalSearch.LocalSearchCandidateMoves;
 
 import Utilities.Solver;
 
