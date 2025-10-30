@@ -6,6 +6,7 @@ import LocalSearch.LocalSearchSolver;
 import LocalSearch.StartingSolutionType;
 import Utilities.*;
 import java.util.*;
+//import java.util.stream.Node;
 
 public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
 
@@ -20,25 +21,18 @@ public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
     public Solution steepestLocalSearch(Instance instance, StartingSolutionType startingSolutionType, IntraRouteMoveType intraRouteMoveType) {
         int startTime = (int) System.currentTimeMillis();
 
-        // --- Step 1: Build candidate edges ---
         Map<Integer, Set<Integer>> candidateEdges = buildCandidateEdges(instance, NUM_CANDIDATES);
 
-        // --- Step 2: Generate random starting solution ---
         Solution currentSolution = generateRandomSolution(instance);
         List<Node> selectedNodes = new ArrayList<>(currentSolution.selectedNodes);
         List<Integer> cycle = new ArrayList<>(currentSolution.cycle);
         Set<Integer> selectedIds = new HashSet<>();
         for (Node n : selectedNodes) selectedIds.add(n.id);
-        Map<Integer, Integer> nodeIndexMap = new HashMap<>();
-        for (int i = 0; i < cycle.size(); i++) {
-            nodeIndexMap.put(cycle.get(i), i);
-        }
 
         int currentCost = currentSolution.totalCost;
         int currentDistance = currentSolution.totalDistance;
         boolean improved = true;
 
-        // --- Step 3: Local Search Loop ---
         while (improved) {
             improved = false;
             int bestDelta = 0;
@@ -46,47 +40,62 @@ public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
             String bestMoveType = null;
             int[] bestMove = null;
 
-            // --- Step 4 & 5: Iterate over candidate moves ---
-            for (int nodeId : selectedIds) {
+            // Iterate over selected nodes
+            for (int idx = 0; idx < cycle.size(); idx++) {
+                int nodeId = cycle.get(idx);
                 Set<Integer> neighbors = candidateEdges.get(nodeId);
                 if (neighbors == null) continue;
 
+                int prevIdx = (idx == 0) ? cycle.size() - 1 : idx - 1;
+                int nextIdx = (idx == cycle.size() - 1) ? 0 : idx + 1;
+                int prevNodeId = cycle.get(prevIdx);
+                int nextNodeId = cycle.get(nextIdx);
+
                 for (int neighborId : neighbors) {
                     if (selectedIds.contains(neighborId)) {
-                        // --- Potential INTRA-route move ---
-                        // This means (nodeId, neighborId) is a candidate edge.
-                        // We evaluate the 2-opt move that creates this edge.
-                        int i = nodeIndexMap.get(nodeId);
-                        int j = nodeIndexMap.get(neighborId);
+                        // --- INTRA-route candidate move ---
+                        // The candidate edge (nodeId, neighborId) should be introduced
+                        int neighborIdx = cycle.indexOf(neighborId);
 
-                        // To create edge (i, j), we must break (i, i+1) and (j-1, j)
-                        // This is one of two possible 2-opt moves. We check the one that is not a simple reversal.
-                        if (j != (i + 1) % cycle.size()) {
-                            int[] move = new int[]{i, j};
-                            int delta = calculateIntraDelta(instance, cycle, move, intraRouteMoveType);
-                            if (delta < bestDelta) {
-                                bestDelta = delta;
-                                bestMove = move;
-                                bestMoveType = "INTRA";
-                            }
+                        // Skip if already adjacent in cycle
+                        if (Math.abs(idx - neighborIdx) == 1 ||
+                                (idx == 0 && neighborIdx == cycle.size() - 1) ||
+                                (neighborIdx == 0 && idx == cycle.size() - 1)) {
+                            continue;
+                        }
+
+                        int[] move = new int[]{idx, neighborIdx};
+                        int delta = calculateIntraDelta(instance, cycle, move, intraRouteMoveType);
+                        if (delta < bestDelta) {
+                            bestDelta = delta;
+                            bestMove = move;
+                            bestMoveType = "INTRA";
                         }
                     } else {
-                        // --- Potential INTER-route move ---
-                        // Swap selected `nodeId` with non-selected `neighborId`
-                        DeltaResult deltaResult = calculateInterDeltaDetailed(instance, cycle, selectedNodes,
-                                nodeId, neighborId);
+                        // --- INTER-route candidate move ---
+                        // Exchange a selected node with non-selected neighborId
+                        // Two options: exchange prevNodeId or nextNodeId with neighborId
+                        // This introduces edge (nodeId, neighborId)
 
-                        if (deltaResult.totalDelta < bestDelta) {
-                            bestDelta = deltaResult.totalDelta;
-                            bestDistanceDelta = deltaResult.distanceDelta;
-                            bestMove = new int[]{nodeId, neighborId};
+                        DeltaResult delta1 = calculateInterDeltaDetailed(instance, cycle, selectedNodes, prevNodeId, neighborId);
+                        if (delta1.totalDelta < bestDelta) {
+                            bestDelta = delta1.totalDelta;
+                            bestDistanceDelta = delta1.distanceDelta;
+                            bestMove = new int[]{prevNodeId, neighborId};
+                            bestMoveType = "INTER";
+                        }
+
+                        DeltaResult delta2 = calculateInterDeltaDetailed(instance, cycle, selectedNodes, nextNodeId, neighborId);
+                        if (delta2.totalDelta < bestDelta) {
+                            bestDelta = delta2.totalDelta;
+                            bestDistanceDelta = delta2.distanceDelta;
+                            bestMove = new int[]{nextNodeId, neighborId};
                             bestMoveType = "INTER";
                         }
                     }
                 }
             }
 
-            // --- Step 6: Apply best move ---
             if (bestDelta < 0 && bestMoveType != null) {
                 improved = true;
 
@@ -94,22 +103,12 @@ public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
                     applyIntraMove(cycle, bestMove, intraRouteMoveType);
                     currentDistance += bestDelta;
                     currentCost += bestDelta;
-                    // Rebuild index map after cycle modification
-                    nodeIndexMap.clear();
-                    for (int i = 0; i < cycle.size(); i++) {
-                        nodeIndexMap.put(cycle.get(i), i);
-                    }
                 } else {
                     int selectedNodeId = bestMove[0];
                     int nonSelectedNodeId = bestMove[1];
                     applyInterMove(instance, selectedNodes, cycle, selectedIds, selectedNodeId, nonSelectedNodeId);
                     currentDistance += bestDistanceDelta;
                     currentCost += bestDelta;
-                    // Rebuild index map after cycle modification
-                    nodeIndexMap.clear();
-                    for (int i = 0; i < cycle.size(); i++) {
-                        nodeIndexMap.put(cycle.get(i), i);
-                    }
                 }
             }
         }
@@ -117,6 +116,7 @@ public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
         int endTime = (int) System.currentTimeMillis();
         return new Solution(selectedNodes, cycle, currentCost, currentDistance, endTime - startTime);
     }
+
 
 
     private Map<Integer, Set<Integer>> buildCandidateEdges(Instance instance, int k) {
@@ -136,7 +136,6 @@ public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
             // Sort by (distance + cost)
             neighbors.sort(Comparator.comparingInt(a -> a[1]));
 
-            // Keep top k
             Set<Integer> nearest = new HashSet<>();
             for (int i = 0; i < Math.min(k, neighbors.size()); i++) {
                 nearest.add(neighbors.get(i)[0]);
@@ -147,9 +146,4 @@ public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
 
         return candidateEdges;
     }
-
-
-
-
-
 }
