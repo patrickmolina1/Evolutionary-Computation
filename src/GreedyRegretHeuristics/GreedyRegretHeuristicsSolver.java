@@ -188,59 +188,65 @@ public class GreedyRegretHeuristicsSolver extends Solver {
         int numToSelect = (int) Math.ceil(n / 2.0);
 
         while (selected.size() < numToSelect && !remaining.isEmpty()) {
-            Node bestCandidate = null;
-            int bestPosition = -1;
+            // Step 1: Find best candidate to add based on regret
+            Node bestCandidateToAdd = null;
             int maxRegret = Integer.MIN_VALUE;
 
-            // For each candidate, find the two best insertion positions
             for (Node candidate : remaining) {
-                int bestIncrease = Integer.MAX_VALUE;
-                int secondBestIncrease = Integer.MAX_VALUE;
-                int bestPos = -1;
+                // Find minimum distance to any node in tour
+                int minDistanceToTour = Integer.MAX_VALUE;
+                int secondMinDistanceToTour = Integer.MAX_VALUE;
+
+                for (Node inTour : selected) {
+                    int distance = instance.distanceMatrix[inTour.id][candidate.id];
+                    if (distance < minDistanceToTour) {
+                        secondMinDistanceToTour = minDistanceToTour;
+                        minDistanceToTour = distance;
+                    } else if (distance < secondMinDistanceToTour) {
+                        secondMinDistanceToTour = distance;
+                    }
+                }
+
+                int bestMetric = minDistanceToTour + candidate.cost;
+                int secondBestMetric = secondMinDistanceToTour + candidate.cost;
+                int regret = secondBestMetric - bestMetric;
+
+                if (regret > maxRegret) {
+                    maxRegret = regret;
+                    bestCandidateToAdd = candidate;
+                }
+            }
+
+            // Step 2: Find best position to insert the selected candidate
+            if (bestCandidateToAdd != null) {
+                int bestPosition = -1;
+                int minIncrease = Integer.MAX_VALUE;
 
                 for (int pos = 0; pos < order.size(); pos++) {
                     int prevNodeId = order.get(pos);
                     int nextNodeId = order.get((pos + 1) % order.size());
 
                     int distPrevToNext = instance.distanceMatrix[prevNodeId][nextNodeId];
-                    int distPrevToCandidate = instance.distanceMatrix[prevNodeId][candidate.id];
-                    int distCandidateToNext = instance.distanceMatrix[candidate.id][nextNodeId];
+                    int distPrevToCandidate = instance.distanceMatrix[prevNodeId][bestCandidateToAdd.id];
+                    int distCandidateToNext = instance.distanceMatrix[bestCandidateToAdd.id][nextNodeId];
 
                     int distanceIncrease = distPrevToCandidate + distCandidateToNext - distPrevToNext;
-                    // The objective function includes distance increase + node cost
-                    int objectiveIncrease = distanceIncrease + candidate.cost;
+                    int objectiveIncrease = distanceIncrease + bestCandidateToAdd.cost;
 
-                    if (objectiveIncrease < bestIncrease) {
-                        secondBestIncrease = bestIncrease;
-                        bestIncrease = objectiveIncrease;
-                        bestPos = pos + 1;
-                    } else if (objectiveIncrease < secondBestIncrease) {
-                        secondBestIncrease = objectiveIncrease;
+                    if (objectiveIncrease < minIncrease) {
+                        minIncrease = objectiveIncrease;
+                        bestPosition = pos + 1;
                     }
                 }
 
-                // Calculate regret (difference between second best and best)
-                int regret = secondBestIncrease - bestIncrease;
-
-                // Select the candidate with the highest regret
-                if (regret > maxRegret) {
-                    maxRegret = regret;
-                    bestCandidate = candidate;
-                    bestPosition = bestPos;
-                }
-            }
-
-            // Insert the chosen candidate at its best position
-            if (bestCandidate != null) {
-                selected.add(bestPosition, bestCandidate);
-                order.add(bestPosition, bestCandidate.id);
-                remaining.remove(bestCandidate);
+                selected.add(bestPosition, bestCandidateToAdd);
+                order.add(bestPosition, bestCandidateToAdd.id);
+                remaining.remove(bestCandidateToAdd);
             } else {
                 break;
             }
         }
 
-        // Calculate final solution costs
         int totalDistance = 0;
         for (int i = 0; i < order.size(); i++) {
             int from = order.get(i);
@@ -254,6 +260,7 @@ public class GreedyRegretHeuristicsSolver extends Solver {
         int endTime = (int) System.currentTimeMillis();
         return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
+
 
     public Solution greedyWeightedRegretNearestNeighbor(Instance instance, Node startNode, double weightRegret, double weightObjective) {
         int startTime = (int) System.currentTimeMillis();
@@ -269,58 +276,64 @@ public class GreedyRegretHeuristicsSolver extends Solver {
         int numToSelect = (int) Math.ceil(n / 2.0);
 
         while (selected.size() < numToSelect && !remaining.isEmpty()) {
-            Node bestCandidate = null;
-            int bestPosition = -1;
+            Node bestCandidateToAdd = null;
             double maxWeightedScore = Double.NEGATIVE_INFINITY;
 
-            // For each candidate, find the two best insertion positions
             for (Node candidate : remaining) {
-                int bestIncrease = Integer.MAX_VALUE;
-                int secondBestIncrease = Integer.MAX_VALUE;
-                int bestPos = -1;
+                int minDistanceToTour = Integer.MAX_VALUE;
+                int secondMinDistanceToTour = Integer.MAX_VALUE;
+
+                for (Node inTour : selected) {
+                    int distance = instance.distanceMatrix[inTour.id][candidate.id];
+                    if (distance < minDistanceToTour) {
+                        secondMinDistanceToTour = minDistanceToTour;
+                        minDistanceToTour = distance;
+                    } else if (distance < secondMinDistanceToTour) {
+                        secondMinDistanceToTour = distance;
+                    }
+                }
+
+                int bestMetric = minDistanceToTour + candidate.cost;
+                int secondBestMetric = secondMinDistanceToTour + candidate.cost;
+                int regret = secondBestMetric - bestMetric;
+
+                double weightedScore = weightRegret * regret - weightObjective * bestMetric;
+
+                if (weightedScore > maxWeightedScore) {
+                    maxWeightedScore = weightedScore;
+                    bestCandidateToAdd = candidate;
+                }
+            }
+
+            if (bestCandidateToAdd != null) {
+                int bestPosition = -1;
+                int minIncrease = Integer.MAX_VALUE;
 
                 for (int pos = 0; pos < order.size(); pos++) {
                     int prevNodeId = order.get(pos);
                     int nextNodeId = order.get((pos + 1) % order.size());
 
                     int distPrevToNext = instance.distanceMatrix[prevNodeId][nextNodeId];
-                    int distPrevToCandidate = instance.distanceMatrix[prevNodeId][candidate.id];
-                    int distCandidateToNext = instance.distanceMatrix[candidate.id][nextNodeId];
+                    int distPrevToCandidate = instance.distanceMatrix[prevNodeId][bestCandidateToAdd.id];
+                    int distCandidateToNext = instance.distanceMatrix[bestCandidateToAdd.id][nextNodeId];
 
                     int distanceIncrease = distPrevToCandidate + distCandidateToNext - distPrevToNext;
-                    int objectiveIncrease = distanceIncrease + candidate.cost;
+                    int objectiveIncrease = distanceIncrease + bestCandidateToAdd.cost;
 
-                    if (objectiveIncrease < bestIncrease) {
-                        secondBestIncrease = bestIncrease;
-                        bestIncrease = objectiveIncrease;
-                        bestPos = pos + 1;
-                    } else if (objectiveIncrease < secondBestIncrease) {
-                        secondBestIncrease = objectiveIncrease;
+                    if (objectiveIncrease < minIncrease) {
+                        minIncrease = objectiveIncrease;
+                        bestPosition = pos + 1;
                     }
                 }
 
-                // Calculate regret and weighted score
-                int regret = secondBestIncrease - bestIncrease;
-                double weightedScore = (weightRegret * regret) - (weightObjective * bestIncrease);
-
-                if (weightedScore > maxWeightedScore) {
-                    maxWeightedScore = weightedScore;
-                    bestCandidate = candidate;
-                    bestPosition = bestPos;
-                }
-            }
-
-            // Insert the chosen candidate at its best position
-            if (bestCandidate != null) {
-                selected.add(bestPosition, bestCandidate);
-                order.add(bestPosition, bestCandidate.id);
-                remaining.remove(bestCandidate);
+                selected.add(bestPosition, bestCandidateToAdd);
+                order.add(bestPosition, bestCandidateToAdd.id);
+                remaining.remove(bestCandidateToAdd);
             } else {
                 break;
             }
         }
 
-        // Calculate final solution costs
         int totalDistance = 0;
         for (int i = 0; i < order.size(); i++) {
             int from = order.get(i);
@@ -334,4 +347,5 @@ public class GreedyRegretHeuristicsSolver extends Solver {
         int endTime = (int) System.currentTimeMillis();
         return new Solution(selected, order, totalCost, totalDistance, endTime - startTime);
     }
+
 }
