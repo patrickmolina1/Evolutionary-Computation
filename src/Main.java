@@ -21,7 +21,7 @@ public class Main {
 
             long startTime = System.currentTimeMillis();
 
-            LocalSearchCandidateMovesExperimentRunner runner = new LocalSearchCandidateMovesExperimentRunner();
+            GreedyRegretHeuristicsExperimentRunner runner = new GreedyRegretHeuristicsExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
@@ -30,7 +30,7 @@ public class Main {
             // Export results to CSV
             System.out.println("Exporting results...");
             // ensure output directory exists
-            java.io.File outDir = new java.io.File("src/Results/LocalSearchCandidate/" + instance.name);
+            java.io.File outDir = new java.io.File("src/Results/GreedyRegretHeuristics/" + instance.name);
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
