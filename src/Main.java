@@ -2,6 +2,7 @@
 import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
 import GreedyHeuristics.GreedyHeuristicsSolver;
 import GreedyRegretHeuristics.GreedyRegretHeuristicsExperimentRunner;
+import LocalSearch.LocalSearchCandidateMoves.LocalSearchCandidateMovesExperimentRunner;
 import LocalSearch.LocalSearchExperimentRunner;
 import Utilities.ExperimentRunner;
 import Utilities.*;
