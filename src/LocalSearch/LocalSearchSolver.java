@@ -220,7 +220,7 @@ public class LocalSearchSolver extends Solver {
         return new Solution(selectedNodes, cycle, currentCost, currentDistance, endTime - startTime);
     }
 
-    private Solution generateStartingSolution(Instance instance, StartingSolutionType type) {
+    protected Solution generateStartingSolution(Instance instance, StartingSolutionType type) {
         if (type == StartingSolutionType.RANDOM) {
             return generateRandomSolution(instance);
         } else {
