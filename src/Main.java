@@ -2,6 +2,7 @@
 import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
 import GreedyHeuristics.GreedyHeuristicsSolver;
 import GreedyRegretHeuristics.GreedyRegretHeuristicsExperimentRunner;
+import LocalSearch.DeltaLocalSearch.DeltaLocalSearchExperimentRunner;
 import LocalSearch.LocalSearchCandidateMoves.LocalSearchCandidateMovesExperimentRunner;
 import LocalSearch.LocalSearchExperimentRunner;
 import Utilities.ExperimentRunner;
@@ -15,13 +16,13 @@ public class Main {
 
 
         try {
-            Instance instance = new Instance("./raw_data/TSPB.csv", "TSPB");
+            Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
 
             // Create experiment runner
 
             long startTime = System.currentTimeMillis();
 
-            GreedyRegretHeuristicsExperimentRunner runner = new GreedyRegretHeuristicsExperimentRunner();
+            DeltaLocalSearchExperimentRunner runner = new DeltaLocalSearchExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
@@ -30,7 +31,7 @@ public class Main {
             // Export results to CSV
             System.out.println("Exporting results...");
             // ensure output directory exists
-            java.io.File outDir = new java.io.File("src/Results/GreedyRegretHeuristics/" + instance.name);
+            java.io.File outDir = new java.io.File("src/Results/DeltaLocalSearch/" + instance.name);
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
