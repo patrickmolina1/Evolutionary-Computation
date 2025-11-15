@@ -6,7 +6,6 @@ import Utilities.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class DeltaLocalSearchExperimentRunner extends ExperimentRunner implements ExperimentRunnerInterface {
 
@@ -22,7 +21,6 @@ public class DeltaLocalSearchExperimentRunner extends ExperimentRunner implement
 
         results.add(testMethod(instance, "DeltaLS_RandomStart_NodeExchange", numIterations));
         results.add(testMethod(instance, "DeltaLS_RandomStart_EdgeExchange", numIterations));
-
 
         return results;
     }

@@ -1,0 +1,3 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
+TSPA,DeltaLS_RandomStart_NodeExchange,82579,101503,91727.50,74,174,101.32,200,157
+TSPA,DeltaLS_RandomStart_EdgeExchange,71474,80843,74334.90,84,190,106.52,200,35
