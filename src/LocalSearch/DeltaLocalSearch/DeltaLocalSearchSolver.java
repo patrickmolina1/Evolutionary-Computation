@@ -136,12 +136,6 @@ public class DeltaLocalSearchSolver extends LocalSearchSolver {
         return new Solution(selectedNodes, cycle, currentCost, currentDistance, endTime - startTime);
     }
 
-    private enum EdgeCheckResult {
-        NOT_EXIST,           // Case 1: Remove from LM
-        DIFFERENT_DIRECTION, // Case 2: Keep in LM, don't apply
-        SAME_DIRECTION       // Case 3: Apply and remove from LM
-    }
-
     private EdgeCheckResult checkEdgeExistence(List<Integer> cycle, StoredMove storedMove) {
         // Find where the stored edges are in the current cycle
         int edge1Pos = findEdgePosition(cycle, storedMove.edge1Start, storedMove.edge1End);
