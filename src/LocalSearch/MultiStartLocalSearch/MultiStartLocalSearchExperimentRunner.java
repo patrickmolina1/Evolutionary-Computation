@@ -4,37 +4,149 @@ import LocalSearch.IntraRouteMoveType;
 import LocalSearch.StartingSolutionType;
 import Utilities.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.FileWriter;
 
-public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner implements ExperimentRunnerInterface {
+public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner {
     public MultiStartLocalSearchSolver solver;
+    private String baseOutputDir;
 
     public MultiStartLocalSearchExperimentRunner(){
         this.solver = new MultiStartLocalSearchSolver();
     }
 
-    @Override
-    public List<ExperimentResult> runExperiments(Instance instance, int numIterations) {
-        List<ExperimentResult> results = new ArrayList<>();
+    public void setBaseOutputDir(String baseOutputDir) {
+        this.baseOutputDir = baseOutputDir;
+    }
 
-        results.add(testMethod(instance, "MSLS", numIterations));
+    public List<ExperimentResult> runExperiments(Instance instance, int numIterations, int numRuns) {
+        List<ExperimentResult> results = new ArrayList<>();
+        List<Solution> allSolutions = new ArrayList<>();
+
+        for (int run = 0; run < numRuns; run++){
+            System.out.println("\n=== Starting Run " + (run + 1) + " of " + numRuns + " ===");
+
+            ExperimentResult result = testMethod(instance, "MSLS", numIterations);
+            results.add(result);
+            allSolutions.addAll(result.solutions);
+
+            // Save this run's results in its own folder
+            if (baseOutputDir != null) {
+                try {
+                    String runDir = baseOutputDir + "/run_" + (run + 1);
+                    java.io.File dir = new java.io.File(runDir);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+
+                    // Export this run's results
+                    List<ExperimentResult> singleRunResult = new ArrayList<>();
+                    singleRunResult.add(result);
+                    exportResults(singleRunResult, runDir);
+
+                    //System.out.println("Run " + (run + 1) + " results saved to: " + runDir);
+                } catch (IOException e) {
+                    System.err.println("Error saving results for run " + (run + 1) + ": " + e.getMessage());
+                }
+            }
+        }
+
+        // Create overall summary for all runs
+        if (baseOutputDir != null) {
+            try {
+                createOverallSummary(instance, results, allSolutions, baseOutputDir);
+                System.out.println("\nOverall summary created for all " + numRuns + " runs (" + allSolutions.size() + " total solutions)");
+            } catch (IOException e) {
+                System.err.println("Error creating overall summary: " + e.getMessage());
+            }
+        }
+
         return results;
     }
 
-    @Override
+    private void createOverallSummary(Instance instance, List<ExperimentResult> results,
+                                     List<Solution> allSolutions, String outputDir) throws IOException {
+        // Create overall statistics for all solutions
+        ExperimentResult overallResult = experimentStatsCalculations(instance, "MSLS_Overall", allSolutions);
+
+        // Export overall summary CSV with run-by-run breakdown
+        String summaryFile = outputDir + "/overall_summary.csv";
+        try (FileWriter writer = new FileWriter(summaryFile)) {
+            writer.append("Run,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID\n");
+
+            // Write each run's summary
+            for (int i = 0; i < results.size(); i++) {
+                ExperimentResult result = results.get(i);
+                writer.append(String.format("%d,%d,%d,%.2f,%d,%d,%.2f,%d,%d\n",
+                        i + 1,
+                        result.minCost,
+                        result.maxCost,
+                        result.avgCost,
+                        result.minRunningTime,
+                        result.maxRunningTime,
+                        result.avgRunningTime,
+                        result.numSolutions,
+                        result.bestSolutionId));
+            }
+
+            // Write overall statistics
+            writer.append(String.format("\nOVERALL,%d,%d,%.2f,%d,%d,%.2f,%d,%d\n",
+                    overallResult.minCost,
+                    overallResult.maxCost,
+                    overallResult.avgCost,
+                    overallResult.minRunningTime,
+                    overallResult.maxRunningTime,
+                    overallResult.avgRunningTime,
+                    overallResult.numSolutions,
+                    overallResult.bestSolutionId));
+        }
+
+        // Export all solutions to a single CSV
+        String allSolutionsFile = outputDir + "/all_solutions.csv";
+        try (FileWriter writer = new FileWriter(allSolutionsFile)) {
+            writer.append("Run,IterationInRun,GlobalIteration,TotalCost,NumNodes,TotalDistance,ObjectiveFunction,TotalRunningTime,Cycle\n");
+
+            int globalIteration = 1;
+            for (int run = 0; run < results.size(); run++) {
+                List<Solution> runSolutions = results.get(run).solutions;
+                for (int i = 0; i < runSolutions.size(); i++) {
+                    Solution sol = runSolutions.get(i);
+                    int objectiveFunction = sol.totalCost + sol.totalDistance;
+                    String cycleStr = sol.cycle.toString()
+                            .replace("[", "")
+                            .replace("]", "")
+                            .replace(", ", "-");
+
+                    writer.append(String.format("%d,%d,%d,%d,%d,%d,%d,%d,\"%s\"\n",
+                            run + 1,
+                            i + 1,
+                            globalIteration++,
+                            sol.totalCost,
+                            sol.selectedNodes.size(),
+                            sol.totalDistance,
+                            objectiveFunction,
+                            sol.totalRunningTime,
+                            cycleStr));
+                }
+            }
+        }
+    }
+
     public ExperimentResult testMethod(Instance instance, String methodName, int numIterations) {
 
         List<Solution> solutions = new ArrayList<>();
-
-
 
         for (int i=0;i<numIterations;i++){
             Solution solution = null;
 
             switch (methodName){
                 case "MSLS":
-                    solution = solver.steepestLocalSearch(instance, StartingSolutionType.RANDOM, IntraRouteMoveType.NODE_EXCHANGE);
+                    solution = solver.steepestLocalSearch(instance, StartingSolutionType.RANDOM, IntraRouteMoveType.EDGE_EXCHANGE);
                     break;
             }
 
@@ -45,7 +157,8 @@ public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner impl
 
         }
 
-
         return experimentStatsCalculations(instance, methodName, solutions);
     }
+
+
 }
