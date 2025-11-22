@@ -18,6 +18,7 @@ public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner impl
     public List<ExperimentResult> runExperiments(Instance instance, int numIterations) {
         List<ExperimentResult> results = new ArrayList<>();
 
+        results.add(testMethod(instance, "MSLS", numIterations));
         return results;
     }
 
@@ -32,7 +33,7 @@ public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner impl
             Solution solution = null;
 
             switch (methodName){
-                case "method":
+                case "MSLS":
                     solution = solver.steepestLocalSearch(instance, StartingSolutionType.RANDOM, IntraRouteMoveType.NODE_EXCHANGE);
                     break;
             }
