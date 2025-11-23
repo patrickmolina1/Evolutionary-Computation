@@ -15,14 +15,14 @@ public class Main {
         // From your file, this value is 50284.55, which we can round to 50285.
         long avgMslsRunTime = 502;
 
-        int numIlsRuns = 1; // Run the whole ILS process 20 times.
+        int numIlsRuns = 5; // Run the whole ILS process 20 times.
 
         // --- RUN ILS EXPERIMENT ---
         System.out.println("--- Running ILS Experiment ---");
         IteratedLocalSearchExperimentRunner ilsRunner = new IteratedLocalSearchExperimentRunner();
 
         // Set the base output directory for all results
-        String ilsOutputDir = "./results/IteratedResults" + instance.name;
+        String ilsOutputDir = "src/Results/IteratedResults";
         ilsRunner.setBaseOutputDir(ilsOutputDir);
 
         // Run the experiments
