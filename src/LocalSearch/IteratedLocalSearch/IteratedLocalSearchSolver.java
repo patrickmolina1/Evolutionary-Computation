@@ -18,38 +18,46 @@ public class IteratedLocalSearchSolver extends LocalSearchSolver {
         this.random = new Random();
     }
 
-    public Solution iteratedLocalSearch(Instance instance, int numIterations, long timePerIteration) {
+    /**
+     * Runs ILS until a stopping time is reached, returning all found local optima.
+     * @param instance The problem instance.
+     * @param stoppingTime The total time in ms to run the algorithm.
+     * @return A list of all local optimum solutions found.
+     */
+    public List<Solution> iteratedLocalSearch(Instance instance, long stoppingTime) {
         long totalStartTime = System.currentTimeMillis();
+        List<Solution> foundSolutions = new ArrayList<>();
 
         Solution initialSolution = generateRandomSolution(instance);
-        Solution bestSolution = steepestLocalSearchFromSolution(instance, initialSolution, timePerIteration);
-        System.out.printf("    Iteration 0: Cost = %d, Runtime = %dms (Current Best)\n", bestSolution.totalCost, bestSolution.totalRunningTime);
+        Solution bestSolution = steepestLocalSearchFromSolution(instance, initialSolution);
+        foundSolutions.add(bestSolution);
         Solution currentSolution = bestSolution;
 
+        System.out.printf("    LS Run 1: Cost = %d, Runtime = %dms (Current Best)\n", bestSolution.totalCost, bestSolution.totalRunningTime);
 
-        for (int i = 1; i < numIterations; i++) {
+        while (System.currentTimeMillis() - totalStartTime < stoppingTime) {
             Solution perturbedSolution = perturb(currentSolution, instance, 4);
-            Solution newLocalOptimum = steepestLocalSearchFromSolution(instance, perturbedSolution, timePerIteration);
+            Solution newLocalOptimum = steepestLocalSearchFromSolution(instance, perturbedSolution);
+            foundSolutions.add(newLocalOptimum);
 
             boolean isNewBest = newLocalOptimum.totalCost < bestSolution.totalCost;
-            System.out.printf("    Iteration %d: Cost = %d, Runtime = %dms%s\n",
-                    i, newLocalOptimum.totalCost, newLocalOptimum.totalRunningTime, isNewBest ? " (New Best)" : "");
+            System.out.printf("    LS Run %d: Cost = %d, Runtime = %dms%s\n",
+                    foundSolutions.size(), newLocalOptimum.totalCost, newLocalOptimum.totalRunningTime, isNewBest ? " (New Best)" : "");
 
             if (isNewBest) {
                 bestSolution = newLocalOptimum;
-                currentSolution = newLocalOptimum;
             }
+            // Acceptance Criterion: always accept the new local optimum to explore more
+            currentSolution = newLocalOptimum;
         }
 
-        bestSolution.totalRunningTime = (int) (System.currentTimeMillis() - totalStartTime);
-        bestSolution.localSearchRuns = numIterations;
-        return bestSolution;
+        return foundSolutions;
     }
 
     /**
-     * Performs a steepest descent local search with a time limit.
+     * Performs a steepest descent local search.
      */
-    private Solution steepestLocalSearchFromSolution(Instance instance, Solution startingSolution, long stoppingTime) {
+    private Solution steepestLocalSearchFromSolution(Instance instance, Solution startingSolution) {
         long startTime = System.currentTimeMillis();
 
         List<Node> selectedNodes = new ArrayList<>(startingSolution.selectedNodes);
@@ -62,10 +70,6 @@ public class IteratedLocalSearchSolver extends LocalSearchSolver {
 
         boolean improved = true;
         while (improved) {
-            if (System.currentTimeMillis() - startTime > stoppingTime) {
-                break; // Stop if the time limit for this iteration is exceeded
-            }
-
             improved = false;
             int bestDelta = 0;
             String bestMoveType = null;
