@@ -14,6 +14,7 @@ public class ExperimentResult {
     public int numSolutions;
     public int bestSolutionId;
     public List<Solution> solutions;
+    public long runTotalTime; // Total time for all iterations in this run (in milliseconds)
 
     public ExperimentResult(String instanceName, String methodName,
                             int minCost, int maxCost, double avgCost, int minRunningTime, int maxRunningTime, double avgRunningTime, int numSolutions,
@@ -29,5 +30,23 @@ public class ExperimentResult {
         this.minRunningTime = minRunningTime;
         this.maxRunningTime = maxRunningTime;
         this.avgRunningTime = avgRunningTime;
+        this.runTotalTime = 0; // Default value
+    }
+
+    public ExperimentResult(String instanceName, String methodName,
+                            int minCost, int maxCost, double avgCost, int minRunningTime, int maxRunningTime, double avgRunningTime, int numSolutions,
+                            int bestSolutionId, List<Solution> solutions, long runTotalTime) {
+        this.instanceName = instanceName;
+        this.methodName = methodName;
+        this.minCost = minCost;
+        this.maxCost = maxCost;
+        this.avgCost = avgCost;
+        this.numSolutions = numSolutions;
+        this.bestSolutionId = bestSolutionId;
+        this.solutions = solutions;
+        this.minRunningTime = minRunningTime;
+        this.maxRunningTime = maxRunningTime;
+        this.avgRunningTime = avgRunningTime;
+        this.runTotalTime = runTotalTime;
     }
 }

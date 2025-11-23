@@ -31,7 +31,13 @@ public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner {
         for (int run = 0; run < numRuns; run++){
             System.out.println("\n=== Starting Run " + (run + 1) + " of " + numRuns + " ===");
 
+            long runStartTime = System.currentTimeMillis();
             ExperimentResult result = testMethod(instance, "MSLS", numIterations);
+            long runEndTime = System.currentTimeMillis();
+            result.runTotalTime = runEndTime - runStartTime;
+
+            System.out.println("Run " + (run + 1) + " completed in " + result.runTotalTime + " ms (" + (result.runTotalTime / 1000.0) + " seconds)");
+
             results.add(result);
             allSolutions.addAll(result.solutions);
 
@@ -56,6 +62,16 @@ public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner {
             }
         }
 
+        // Calculate and display run time statistics
+        double avgRunTime = results.stream().mapToLong(r -> r.runTotalTime).average().orElse(0.0);
+        long minRunTime = results.stream().mapToLong(r -> r.runTotalTime).min().orElse(0);
+        long maxRunTime = results.stream().mapToLong(r -> r.runTotalTime).max().orElse(0);
+
+        System.out.println("\n=== Run Time Statistics ===");
+        System.out.println("Min Run Time: " + minRunTime + " ms (" + (minRunTime / 1000.0) + " seconds)");
+        System.out.println("Max Run Time: " + maxRunTime + " ms (" + (maxRunTime / 1000.0) + " seconds)");
+        System.out.println("Avg Run Time: " + String.format("%.2f", avgRunTime) + " ms (" + String.format("%.2f", avgRunTime / 1000.0) + " seconds)");
+
         // Create overall summary for all runs
         if (baseOutputDir != null) {
             try {
@@ -74,15 +90,20 @@ public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner {
         // Create overall statistics for all solutions
         ExperimentResult overallResult = experimentStatsCalculations(instance, "MSLS_Overall", allSolutions);
 
+        // Calculate average run time
+        double avgRunTime = results.stream().mapToLong(r -> r.runTotalTime).average().orElse(0.0);
+        long minRunTime = results.stream().mapToLong(r -> r.runTotalTime).min().orElse(0);
+        long maxRunTime = results.stream().mapToLong(r -> r.runTotalTime).max().orElse(0);
+
         // Export overall summary CSV with run-by-run breakdown
         String summaryFile = outputDir + "/overall_summary.csv";
         try (FileWriter writer = new FileWriter(summaryFile)) {
-            writer.append("Run,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID\n");
+            writer.append("Run,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID,TotalRunTime\n");
 
             // Write each run's summary
             for (int i = 0; i < results.size(); i++) {
                 ExperimentResult result = results.get(i);
-                writer.append(String.format("%d,%d,%d,%.2f,%d,%d,%.2f,%d,%d\n",
+                writer.append(String.format("%d,%d,%d,%.2f,%d,%d,%.2f,%d,%d,%d\n",
                         i + 1,
                         result.minCost,
                         result.maxCost,
@@ -91,11 +112,12 @@ public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner {
                         result.maxRunningTime,
                         result.avgRunningTime,
                         result.numSolutions,
-                        result.bestSolutionId));
+                        result.bestSolutionId,
+                        result.runTotalTime));
             }
 
             // Write overall statistics
-            writer.append(String.format("\nOVERALL,%d,%d,%.2f,%d,%d,%.2f,%d,%d\n",
+            writer.append(String.format("\nOVERALL,%d,%d,%.2f,%d,%d,%.2f,%d,%d,%.2f\n",
                     overallResult.minCost,
                     overallResult.maxCost,
                     overallResult.avgCost,
@@ -103,7 +125,12 @@ public class MultiStartLocalSearchExperimentRunner extends ExperimentRunner {
                     overallResult.maxRunningTime,
                     overallResult.avgRunningTime,
                     overallResult.numSolutions,
-                    overallResult.bestSolutionId));
+                    overallResult.bestSolutionId,
+                    avgRunTime));
+
+            // Write run time statistics
+            writer.append(String.format("\nRUN TIME STATS:,MinRunTime,MaxRunTime,AvgRunTime\n"));
+            writer.append(String.format(",%d,%d,%.2f\n", minRunTime, maxRunTime, avgRunTime));
         }
 
         // Export all solutions to a single CSV
