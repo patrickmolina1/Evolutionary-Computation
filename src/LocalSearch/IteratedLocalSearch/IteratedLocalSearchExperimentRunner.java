@@ -104,12 +104,17 @@ public class IteratedLocalSearchExperimentRunner extends ExperimentRunner {
             double avgCost = results.stream().mapToInt(r -> r.minCost).average().orElse(0.0);
             int minCost = results.stream().mapToInt(r -> r.minCost).min().orElse(0);
             int maxCost = results.stream().mapToInt(r -> r.minCost).max().orElse(0);
+
+            // Calculate local search runs stats
+            int minLsRuns = results.stream().mapToInt(r -> r.numSolutions).min().orElse(0);
+            int maxLsRuns = results.stream().mapToInt(r -> r.numSolutions).max().orElse(0);
             double avgLsRuns = results.stream().mapToInt(r -> r.numSolutions).average().orElse(0.0);
+
             double avgRunTime = results.stream().mapToLong(r -> r.runTotalTime).average().orElse(0.0);
 
-            writer.append("\nOVERALL,MinCost,MaxCost,AvgCost,AvgLocalSearchRuns,AvgRunTime\n");
-            writer.append(String.format(",%d,%d,%.2f,%.2f,%.2f\n",
-                    minCost, maxCost, avgCost, avgLsRuns, avgRunTime));
+            writer.append("\nOVERALL,MinCost,MaxCost,AvgCost,MinLocalSearchRuns,MaxLocalSearchRuns,AvgLocalSearchRuns,AvgRunTime\n");
+            writer.append(String.format(",%d,%d,%.2f,%d,%d,%.2f,%.2f\n",
+                    minCost, maxCost, avgCost, minLsRuns, maxLsRuns, avgLsRuns, avgRunTime));
         }
 
         // All solutions to a single CSV
