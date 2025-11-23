@@ -220,7 +220,7 @@ public class LocalSearchSolver extends Solver {
         return new Solution(selectedNodes, cycle, currentCost, currentDistance, endTime - startTime);
     }
 
-    private Solution generateStartingSolution(Instance instance, StartingSolutionType type) {
+    protected Solution generateStartingSolution(Instance instance, StartingSolutionType type) {
         if (type == StartingSolutionType.RANDOM) {
             return generateRandomSolution(instance);
         } else {
@@ -249,7 +249,7 @@ public class LocalSearchSolver extends Solver {
         return new Solution(selected, order, totalCost, totalDistance, 0);
     }
 
-    private List<int[]> generateIntraMoves(int cycleSize, IntraRouteMoveType moveType) {
+    protected List<int[]> generateIntraMoves(int cycleSize, IntraRouteMoveType moveType) {
         List<int[]> moves = new ArrayList<>();
 
         if (moveType == IntraRouteMoveType.NODE_EXCHANGE) {
@@ -272,7 +272,7 @@ public class LocalSearchSolver extends Solver {
         return moves;
     }
 
-    private List<int[]> generateInterMoves(Instance instance, Set<Integer> selectedIds) {
+    protected List<int[]> generateInterMoves(Instance instance, Set<Integer> selectedIds) {
         List<int[]> moves = new ArrayList<>();
 
         for (int selectedId : selectedIds) {

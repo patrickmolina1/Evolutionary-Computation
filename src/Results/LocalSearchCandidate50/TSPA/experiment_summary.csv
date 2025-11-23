@@ -1,0 +1,3 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
+TSPA,SteepestLS_RandomStart_NodeExchangeCandidate,82595,97343,89079.07,70,320,92.17,200,7
+TSPA,SteepestLS_RandomStart_EdgeExchangeCandidate,71462,79822,73935.42,78,103,87.85,200,142
