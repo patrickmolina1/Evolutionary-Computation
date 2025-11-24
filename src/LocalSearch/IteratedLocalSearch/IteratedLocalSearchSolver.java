@@ -9,15 +9,7 @@ import Utilities.Solution;
 
 import java.util.*;
 
-/**
- * Iterated Local Search solver with adaptive perturbation and a more advanced acceptance criterion.
- *
- * Improvements:
- *  - Adaptive Perturbation: Strength increases when the search stagnates and resets on finding a new best.
- *  - Probabilistic Acceptance Criterion: Allows escaping local optima by sometimes accepting worse solutions,
- *    but avoids moving to extremely poor solutions.
- *  - Tunable parameters for fine-tuning the search behavior.
- */
+
 public class IteratedLocalSearchSolver extends LocalSearchSolver {
 
     private final Random random;

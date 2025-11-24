@@ -1,2 +1,2 @@
 Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
-TSPA,MSLS,71568,77139,73799.23,190,885,236.81,200,51
+TSPA,MSLS,70876,78396,73932.21,207,270,239.26,200,48

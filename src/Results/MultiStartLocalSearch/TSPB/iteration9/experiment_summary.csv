@@ -1,2 +1,0 @@
-Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
-TSPB,MSLS,45640,52726,48264.21,207,411,275.36,200,178
