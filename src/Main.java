@@ -19,12 +19,12 @@ public class Main {
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
-            List<ExperimentResult> results = runner.runExperiments(instance, 20);
+            List<ExperimentResult> results = runner.runExperiments(instance, 20, 500);
 
             // Export results to CSV
             System.out.println("Exporting results...");
             // ensure output directory exists
-            java.io.File outDir = new java.io.File("src/Results/LargeLS/" + instance.name);
+            java.io.File outDir = new java.io.File("src/Results/LargeNeighborhoodSearch/" + instance.name);
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }

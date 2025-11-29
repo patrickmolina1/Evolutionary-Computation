@@ -18,18 +18,18 @@ public class LargeNeighborhoodSearchExperimentRunner extends ExperimentRunner im
         this.solver = new LargeNeighborhoodSearchSolver();
 
     }
-    @Override
-    public List<ExperimentResult> runExperiments(Instance instance, int numIterations) {
+
+    public List<ExperimentResult> runExperiments(Instance instance, int numIterations, int timeLimitMS) {
         List<ExperimentResult> results = new ArrayList<>();
 
-        results.add(testMethod(instance, "LNS_LS", numIterations));
-        results.add(testMethod(instance, "LNS_NOLS", numIterations));
+        results.add(testMethod(instance, "LNS_LS", numIterations, timeLimitMS));
+        results.add(testMethod(instance, "LNS_NOLS", numIterations, timeLimitMS));
 
         return results;
     }
 
-    @Override
-    public ExperimentResult testMethod(Instance instance, String methodName, int numIterations) {
+
+    public ExperimentResult testMethod(Instance instance, String methodName, int numIterations, int timeLimitMS) {
         List<Solution> solutions = new ArrayList<>();
 
 
@@ -38,10 +38,10 @@ public class LargeNeighborhoodSearchExperimentRunner extends ExperimentRunner im
             int r = new Random().nextInt(instance.nodes.size());
             switch (methodName) {
                 case "LNS_LS":
-                    solution = solver.runLNS_WithLS(instance, IntraRouteMoveType.EDGE_EXCHANGE);
+                    solution = solver.runLNS_WithLS(instance, IntraRouteMoveType.EDGE_EXCHANGE, timeLimitMS);
                     break;
                 case "LNS_NOLS":
-                    solution = solver.runLNS_WithoutLS(instance);
+                    solution = solver.runLNS_WithoutLS(instance, timeLimitMS);
                     break;
             }
 
@@ -55,7 +55,13 @@ public class LargeNeighborhoodSearchExperimentRunner extends ExperimentRunner im
     }
 
 
+    @Override
+    public List<ExperimentResult> runExperiments(Instance instance, int numIterations) {
+        return List.of();
+    }
 
-
-
+    @Override
+    public ExperimentResult testMethod(Instance instance, String methodName, int numIterations) {
+        return null;
+    }
 }

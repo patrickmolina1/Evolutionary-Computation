@@ -12,7 +12,6 @@ import java.util.*;
 public class LargeNeighborhoodSearchSolver extends LocalSearchCandidateMovesSolver {
 
     private static final double DESTROY_PERCENTAGE = 0.30;
-    private static final int TIME_LIMIT_MS = 500;
     private static final int NUM_CANDIDATES = 10;
 
     public LargeNeighborhoodSearchSolver() {
@@ -121,9 +120,9 @@ public class LargeNeighborhoodSearchSolver extends LocalSearchCandidateMovesSolv
     }
 
 
-    public Solution runLNS_WithLS(Instance instance, IntraRouteMoveType intraType) {
+    public Solution runLNS_WithLS(Instance instance, IntraRouteMoveType intraType, int timeLimitMS) {
         int numMainLoop = 0;
-        long endTime = System.currentTimeMillis() + TIME_LIMIT_MS;
+        long endTime = System.currentTimeMillis() + timeLimitMS;
 
         // 1. Generate Initial Solution
         long st = System.currentTimeMillis();
@@ -160,12 +159,15 @@ public class LargeNeighborhoodSearchSolver extends LocalSearchCandidateMovesSolv
         long et = System.currentTimeMillis();
         bestSolution.totalRunningTime = (int) (et - st);
 
+        bestSolution.iterations = numMainLoop;
         return bestSolution;
     }
 
     // --- 2. LNS WITHOUT LOCAL SEARCH ---
-    public Solution runLNS_WithoutLS(Instance instance) {
-        long endTime = System.currentTimeMillis() + TIME_LIMIT_MS;
+    public Solution runLNS_WithoutLS(Instance instance, int timeLimitMS) {
+        int numMainLoop = 0;
+
+        long endTime = System.currentTimeMillis() + timeLimitMS;
 
         // 1. Generate Initial Solution
         long st = System.currentTimeMillis();
@@ -193,9 +195,15 @@ public class LargeNeighborhoodSearchSolver extends LocalSearchCandidateMovesSolv
                     bestSolution = currentSolution;
                 }
             }
+
+            numMainLoop++;
         }
+
+        System.out.println("LNS without LS completed " + numMainLoop + " main iterations.");
         long et = System.currentTimeMillis();
         bestSolution.totalRunningTime = (int) (et - st);
+
+        bestSolution.iterations = numMainLoop;
         return bestSolution;
     }
 
