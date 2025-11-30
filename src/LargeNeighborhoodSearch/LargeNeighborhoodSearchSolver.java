@@ -3,6 +3,7 @@ package LargeNeighborhoodSearch;
 import LocalSearch.DeltaResult;
 import LocalSearch.IntraRouteMoveType;
 import LocalSearch.LocalSearchCandidateMoves.LocalSearchCandidateMovesSolver;
+import LocalSearch.StartingSolutionType;
 import Utilities.Instance;
 import Utilities.Node;
 import Utilities.Solution;
@@ -18,13 +19,83 @@ public class LargeNeighborhoodSearchSolver extends LocalSearchCandidateMovesSolv
 
     }
 
-    public Solution steepestLocalSearch(Instance instance, Solution startingSolution, IntraRouteMoveType intraRouteMoveType) {
+    public Solution steepestLocalSearch(Instance instance, Solution startingSolution, IntraRouteMoveType intraRouteMoveType){
+        int startTime = (int) System.currentTimeMillis();
+
+
+        // Make copies of the solution data
+        List<Node> selectedNodes = new ArrayList<>(startingSolution.selectedNodes);
+        List<Integer> cycle = new ArrayList<>(startingSolution.cycle);
+        Set<Integer> selectedIds = new HashSet<>();
+        for (Node n : selectedNodes) selectedIds.add(n.id);
+
+        int currentCost = startingSolution.totalCost;
+        int currentDistance = startingSolution.totalDistance;
+
+        boolean improved = true;
+
+        while (improved) {
+            improved = false;
+
+            int bestDelta = 0;
+            String bestMoveType = null;
+            int[] bestMove = null;
+            int bestDistanceDelta = 0;
+
+            // Evaluate all intra-route moves
+            List<int[]> intraMoves = generateIntraMoves(cycle.size(), intraRouteMoveType);
+            for (int[] move : intraMoves) {
+                int delta = calculateIntraDelta(instance, cycle, move, intraRouteMoveType);
+                if (delta < bestDelta) {
+                    bestDelta = delta;
+                    bestMoveType = "INTRA";
+                    bestMove = move;
+                }
+            }
+
+            // Evaluate all inter-route moves
+            List<int[]> interMoves = generateInterMoves(instance, selectedIds);
+            for (int[] move : interMoves) {
+                int selectedNodeId = move[0];
+                int nonSelectedNodeId = move[1];
+
+                DeltaResult deltaResult = calculateInterDeltaDetailed(instance, cycle, selectedNodes,
+                        selectedNodeId, nonSelectedNodeId);
+                if (deltaResult.totalDelta < bestDelta) {
+                    bestDelta = deltaResult.totalDelta;
+                    bestDistanceDelta = deltaResult.distanceDelta;
+                    bestMoveType = "INTER";
+                    bestMove = move;
+                }
+            }
+
+            // Apply best move if improving
+            if (bestDelta < 0) {
+                improved = true;
+
+                if (bestMoveType.equals("INTRA")) {
+                    applyIntraMove(cycle, bestMove, intraRouteMoveType);
+                    currentDistance += bestDelta;
+                    currentCost += bestDelta;
+                } else {
+                    int selectedNodeId = bestMove[0];
+                    int nonSelectedNodeId = bestMove[1];
+                    applyInterMove(instance, selectedNodes, cycle, selectedIds, selectedNodeId, nonSelectedNodeId);
+
+                    currentDistance += bestDistanceDelta;
+                    currentCost += bestDelta;
+                }
+            }
+        }
+
+        int endTime = (int) System.currentTimeMillis();
+        return new Solution(selectedNodes, cycle, currentCost, currentDistance, endTime - startTime);
+    }
+
+    public Solution steepestLocalSearchCandidate(Instance instance, Solution startingSolution, IntraRouteMoveType intraRouteMoveType) {
         int startTime = (int) System.currentTimeMillis();
 
         Map<Integer, Set<Integer>> candidateEdges = buildCandidateEdges(instance, NUM_CANDIDATES);
-
-        // DO NOT GENERATE RANDOM HERE. USE INPUT.
-        Solution currentSolution = startingSolution;
 
         List<Node> selectedNodes = new ArrayList<>(startingSolution.selectedNodes);
         List<Integer> cycle = new ArrayList<>(startingSolution.cycle);
@@ -174,7 +245,7 @@ public class LargeNeighborhoodSearchSolver extends LocalSearchCandidateMovesSolv
         Solution bestSolution = generateRandomSolution(instance);
 
         // Initial LS is still required by prompt
-        bestSolution = steepestLocalSearch(instance, bestSolution, null);
+        //bestSolution = steepestLocalSearch(instance, bestSolution, null);
 
         Solution currentSolution = bestSolution;
 
