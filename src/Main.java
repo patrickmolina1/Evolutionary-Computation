@@ -1,52 +1,53 @@
-import LocalSearch.IteratedLocalSearch.IteratedLocalSearchExperimentRunner;
-import Utilities.ExperimentResult;
-import Utilities.Instance;
 
-import java.io.IOException;
+import GlobalConvexity.GlobalConvexityExperimentRunner;
+import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
+import GreedyHeuristics.GreedyHeuristicsSolver;
+import GreedyRegretHeuristics.GreedyRegretHeuristicsExperimentRunner;
+import LocalSearch.LocalSearchCandidateMoves.LocalSearchCandidateMovesExperimentRunner;
+import LocalSearch.LocalSearchExperimentRunner;
+import Utilities.ExperimentRunner;
+import Utilities.*;
+
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        Instance instance = new Instance("./raw_data/TSPB.csv", "TSPB");
-        long totalStartTime = System.currentTimeMillis();
+    public static void main(String[] args) {
 
-        // --- Manually enter the average MSLS *run* time here ---
-        // This is the stopping condition for each ILS run.
-        // From your file, this value is 50284.55, which we can round to 50285.
-        long avgMslsRunTime = 502;
 
-        int numIlsRuns = 5; // Run the whole ILS process 20 times.
 
-        // --- RUN ILS EXPERIMENT ---
-        System.out.println("--- Running ILS Experiment ---");
-        IteratedLocalSearchExperimentRunner ilsRunner = new IteratedLocalSearchExperimentRunner();
+        try {
+            Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
 
-        // Set the base output directory for all results
-        String ilsOutputDir = "src/Results/IteratedResults";
-        ilsRunner.setBaseOutputDir(ilsOutputDir);
+            // Create experiment runner
 
-        // Run the experiments
-        List<ExperimentResult> ilsResults = ilsRunner.runExperiments(instance, numIlsRuns, avgMslsRunTime);
+            long startTime = System.currentTimeMillis();
 
-        // --- FINAL CONSOLE SUMMARY ---
-        System.out.println("\n--- ILS Experiment Completed ---");
-        System.out.println("Full results saved in: " + ilsOutputDir);
+            GlobalConvexityExperimentRunner runner = new GlobalConvexityExperimentRunner();
 
-        // Calculate and print overall statistics from the best result of each run
-        int minCost = ilsResults.stream().mapToInt(r -> r.minCost).min().orElse(0);
-        int maxCost = ilsResults.stream().mapToInt(r -> r.minCost).max().orElse(0);
-        double avgCost = ilsResults.stream().mapToInt(r -> r.minCost).average().orElse(0.0);
-        double avgRunTime = ilsResults.stream().mapToLong(r -> r.runTotalTime).average().orElse(0.0);
-        double avgLsRuns = ilsResults.stream().mapToInt(r -> r.numSolutions).average().orElse(0.0);
+            // Run experiments (e.g., 100 iterations per method)
+            System.out.println("Running experiments...");
+            List<ExperimentResult> results = runner.runExperiments(instance, 1000);
 
-        System.out.printf("\n--- Overall ILS Results (from %d runs) ---\n", numIlsRuns);
-        System.out.printf("Min Best Cost: %d\n", minCost);
-        System.out.printf("Max Best Cost: %d\n", maxCost);
-        System.out.printf("Avg Best Cost: %.2f\n", avgCost);
-        System.out.printf("Avg Total Running Time per run: %.2f ms\n", avgRunTime);
-        System.out.printf("Avg Basic Local Searches per run: %.2f\n", avgLsRuns);
+            // Export results to CSV
+            System.out.println("Exporting results...");
+            // ensure output directory exists
+            java.io.File outDir = new java.io.File("src/Results/GlobalConvexity/" + instance.name);
+            if (!outDir.exists()) {
+                outDir.mkdirs();
+            }
+            runner.exportResults(results, outDir.getPath());
 
-        long totalEndTime = System.currentTimeMillis();
-        System.out.println("\nTotal Execution Time: " + (totalEndTime - totalStartTime) + " ms");
+            System.out.println("Experiments completed successfully!");
+
+            // Print summary
+            for (ExperimentResult result : results) {
+                System.out.printf("%s - Min: %d, Max: %d, Avg: %.2f, RunningTime: %.2f\n",
+                        result.methodName, result.minCost, result.maxCost, result.avgCost, result.avgRunningTime);
+            }
+            long endTime = System.currentTimeMillis();
+            System.out.println("Total Execution Time: " + (endTime - startTime));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

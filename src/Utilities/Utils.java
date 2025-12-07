@@ -29,6 +29,44 @@ public class Utils {
         return nodes;
     }
 
+    public static Solution getBestSolution(String filePath, Instance instance) throws IOException{
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath+"best"+instance.name+".csv"))) {
+            // Skip header
+            String line = br.readLine();
+            if (line == null) return null;
+
+            // Read data row
+            line = br.readLine();
+            if (line == null) return null;
+
+            // Handle quoted cycle list safely
+            String[] parts = line.split(",");
+
+
+            //0: Method,
+            // 1: Instance,
+            // 2: SolutionID,
+            // 3: TotalCost,
+            // 4: NumNodes,
+            // 5: TotalDistance,
+            // 6: ObjectiveFunction,
+            // 7: TotalRunningTime,
+            // 8: TotalIterations,
+            // 9: Cycle
+
+            //Solution(List<Node> selectedNodes, List<Integer> cycle, int totalCost, int totalDistance, int totalRunningTime)
+            Solution s = new Solution(transformNodeIDsToNodes(parts[9],instance.nodes),
+                    transformNodeIDsToCycle(parts[9]),
+                    Integer.parseInt(parts[3]),
+                    Integer.parseInt(parts[5]),Integer.parseInt(parts[7]));
+
+
+            return s;
+        }
+
+    }
+
     public static int calculateDistance(Node a, Node b) {
         double distance = Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
         return (int) Math.round(distance);
@@ -49,5 +87,23 @@ public class Utils {
         }
 
         return distanceMatrix;
+    }
+
+    public static List<Node> transformNodeIDsToNodes(String nodeIDs, List<Node> allNodes){
+        List<Node> nodes = new ArrayList<>();
+        String[] ids = nodeIDs.replace("\"", "").split("-");
+        for(String id : ids){
+            nodes.add(allNodes.get(Integer.parseInt(id)));
+        }
+        return nodes;
+    }
+
+    public static List<Integer> transformNodeIDsToCycle(String nodeIDs){
+        List<Integer> cycle = new ArrayList<>();
+        String[] ids = nodeIDs.replace("\"", "").split("-");
+        for(String id : ids){
+            cycle.add(Integer.parseInt(id));
+        }
+        return cycle;
     }
 }
