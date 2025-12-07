@@ -1,0 +1,2 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
+TSPA,greedyLocalSearch,74392,86497,79130.91,0,106,27.64,1000,47
