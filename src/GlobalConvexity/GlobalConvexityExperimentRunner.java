@@ -60,7 +60,7 @@ public class GlobalConvexityExperimentRunner extends ExperimentRunner implements
         
         return switch (similarityType) {
             case EDGE_BASED -> SimilarityMetrics.edgeBasedSimilarity(sol1, sol2);
-            case NODE_BASED -> SimilarityMetrics.cyclicNodeBasedSimilarity(sol1, sol2);
+            case NODE_BASED -> SimilarityMetrics.nodeBasedSimilarity(sol1, sol2);
         };
 
     }
@@ -112,8 +112,12 @@ public class GlobalConvexityExperimentRunner extends ExperimentRunner implements
             for (int i = 0; i < result.solutions.size(); i++) {
                 Solution sol = result.solutions.get(i);
 
-                double BestOf1000Edge = calculateSimilarity(sol, result.solutions.get(bestSolutionId - 1), SimilarityType.EDGE_BASED);
-                double BestOf1000Node = calculateSimilarity(sol, result.solutions.get(bestSolutionId - 1), SimilarityType.NODE_BASED);
+                double BestOf1000Edge = 0.0;
+                double BestOf1000Node = 0.0;
+                if (i != bestSolutionId - 1) {
+                    BestOf1000Edge = calculateSimilarity(sol, result.solutions.get(bestSolutionId - 1), SimilarityType.EDGE_BASED);
+                    BestOf1000Node = calculateSimilarity(sol, result.solutions.get(bestSolutionId - 1), SimilarityType.NODE_BASED);
+                }
 
                 double Avg1000Edge = 0.0;
                 double Avg1000Node = 0.0;

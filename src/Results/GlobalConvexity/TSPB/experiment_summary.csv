@@ -1,2 +1,2 @@
-Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
-TSPB,greedyLocalSearch,47520,56906,51549.25,1,75,17.32,1000,269
+Instance,Method,AvgCost,MinCost,MaxCost,MinTime,MaxTime,AvgTime,NumSolutions,BestSolutionID
+TSPB,greedyLocalSearch,51631.63,47369,58362,18,221,40.41,1000,575
