@@ -1,0 +1,2 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,MinLsRuns,MaxLsRuns,AvgLsRuns,NumSolutions,BestSolutionID
+TSPA,IteratedLocalSearch,70032,74889,72076.79,8,259,40.55,1216,1216,1216.00,1216,610

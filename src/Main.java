@@ -1,4 +1,5 @@
 
+import GlobalConvexity.GlobalConvexityExperimentRunner;
 import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
 import GreedyHeuristics.GreedyHeuristicsSolver;
 import GreedyRegretHeuristics.GreedyRegretHeuristicsExperimentRunner;
@@ -22,16 +23,16 @@ public class Main {
 
             long startTime = System.currentTimeMillis();
 
-            DeltaLocalSearchExperimentRunner runner = new DeltaLocalSearchExperimentRunner();
+            GlobalConvexityExperimentRunner runner = new GlobalConvexityExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
-            List<ExperimentResult> results = runner.runExperiments(instance, 200);
+            List<ExperimentResult> results = runner.runExperiments(instance, 1000);
 
             // Export results to CSV
             System.out.println("Exporting results...");
             // ensure output directory exists
-            java.io.File outDir = new java.io.File("src/Results/DeltaLocalSearch/" + instance.name);
+            java.io.File outDir = new java.io.File("src/Results/GlobalConvexity/" + instance.name);
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
@@ -51,4 +52,3 @@ public class Main {
         }
     }
 }
-
