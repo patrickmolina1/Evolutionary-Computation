@@ -230,7 +230,7 @@ public class LocalSearchSolver extends Solver {
         }
     }
 
-    protected Solution generateRandomSolution(Instance instance) {
+    public Solution generateRandomSolution(Instance instance) {
         int n = instance.nodes.size();
         int numToSelect = (int) Math.ceil(n / 2.0);
 
