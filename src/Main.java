@@ -3,6 +3,7 @@ import GlobalConvexity.GlobalConvexityExperimentRunner;
 import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
 import GreedyHeuristics.GreedyHeuristicsSolver;
 import GreedyRegretHeuristics.GreedyRegretHeuristicsExperimentRunner;
+import LocalSearch.DeltaLocalSearch.DeltaLocalSearchExperimentRunner;
 import LocalSearch.LocalSearchCandidateMoves.LocalSearchCandidateMovesExperimentRunner;
 import LocalSearch.LocalSearchExperimentRunner;
 import Utilities.ExperimentRunner;
@@ -16,7 +17,7 @@ public class Main {
 
 
         try {
-            Instance instance = new Instance("./raw_data/TSPB.csv", "TSPB");
+            Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
 
             // Create experiment runner
 
