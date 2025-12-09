@@ -1,0 +1,3 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,MinIterations,MaxIterations,AvgIterations,NumSolutions,BestSolutionID
+TSPA,LNS_LS,69178,69381,69255.30,49348,49391,49352.35,8802,10293,9694.30,20,7
+TSPA,LNS_NOLS,69207,69761,69339.35,49348,49349,49348.10,49849,51313,50614.10,20,2

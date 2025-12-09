@@ -13,7 +13,7 @@ public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
     private static final int NUM_CANDIDATES = 10; // Can be tuned experimentally
 
 
-    LocalSearchCandidateMovesSolver(){
+    public LocalSearchCandidateMovesSolver(){
 
     }
 
@@ -119,7 +119,7 @@ public class LocalSearchCandidateMovesSolver extends LocalSearchSolver {
 
 
 
-    private Map<Integer, Set<Integer>> buildCandidateEdges(Instance instance, int k) {
+    protected Map<Integer, Set<Integer>> buildCandidateEdges(Instance instance, int k) {
         Map<Integer, Set<Integer>> candidateEdges = new HashMap<>();
         int n = instance.nodes.size();
 

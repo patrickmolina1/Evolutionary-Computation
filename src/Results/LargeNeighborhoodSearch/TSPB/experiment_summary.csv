@@ -1,0 +1,3 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,MinIterations,MaxIterations,AvgIterations,NumSolutions,BestSolutionID
+TSPB,LNS_LS,43565,44028,43857.80,50285,50300,50289.25,6985,8957,7824.15,20,20
+TSPB,LNS_NOLS,43834,44185,43973.70,50285,50291,50285.50,49998,52395,51642.80,20,3

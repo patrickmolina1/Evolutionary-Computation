@@ -8,6 +8,7 @@ public class Solution {
     public int totalCost;
     public int totalDistance;
     public int totalRunningTime;
+    public int iterations;
 
     public Solution(List<Node> selectedNodes, List<Integer> cycle, int totalCost, int totalDistance, int totalRunningTime) {
         this.selectedNodes = selectedNodes;
@@ -15,6 +16,7 @@ public class Solution {
         this.totalCost = totalCost;
         this.totalDistance = totalDistance;
         this.totalRunningTime = totalRunningTime;
+        this.iterations = 0;
     }
 
 }
