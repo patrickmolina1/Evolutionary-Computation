@@ -30,10 +30,11 @@ public class HybridEvolutionaryExperimentRunner extends ExperimentRunner impleme
         List<Solution> solutions = new ArrayList<>();
 
         for (int i = 0; i < numIterations; i++) {
-            System.out.println("  Iteration " + (i + 1) + "/" + numIterations);
+            System.out.println("---Iteration " + (i + 1) + "/" + numIterations+"---");
             Solution solution = solver.hybridEvolutionary(instance, timeLimitMs, operator, useLS);
             if (solution != null) {
                 solutions.add(solution);
+                System.out.println("    Cost = " + solution.totalCost + ", LS Calls = " + solution.iterations);
             }
         }
 
