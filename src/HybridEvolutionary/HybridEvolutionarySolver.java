@@ -137,56 +137,37 @@ public class HybridEvolutionarySolver extends Solver {
     }
 
     private Solution recombinationOperator2(Instance instance, Solution parent1, Solution parent2) {
-        // Choose one parent as base (randomly)
+        // Choose one parent as base
         Solution baseParent = random.nextBoolean() ? parent1 : parent2;
         Solution otherParent = (baseParent == parent1) ? parent2 : parent1;
 
         Set<Integer> otherNodes = new HashSet<>(otherParent.cycle);
 
-        // Keep only nodes that are in both parents
+        // Keep only common nodes
         List<Integer> filteredCycle = new ArrayList<>();
+        List<Node> filteredSelectedNodes = new ArrayList<>();
+
         for (Integer nodeId : baseParent.cycle) {
             if (otherNodes.contains(nodeId)) {
                 filteredCycle.add(nodeId);
-            }
-        }
-
-        // Build partial solution
-        Set<Integer> selectedIds = new HashSet<>(filteredCycle);
-
-        // Repair solution using greedy repair (similar to LNS)
-        int targetSize = (int) Math.ceil(instance.nodes.size() / 2.0);
-
-        while (selectedIds.size() < targetSize) {
-            int bestNodeId = -1;
-            int bestCost = Integer.MAX_VALUE;
-            int bestPos = -1;
-
-            for (Node node : instance.nodes) {
-                if (!selectedIds.contains(node.id)) {
-                    // Try inserting at each position
-                    for (int pos = 0; pos <= filteredCycle.size(); pos++) {
-                        int insertCost = calculateInsertionCost(instance, filteredCycle, node.id, pos);
-                        int totalCost = insertCost + node.cost;
-
-                        if (totalCost < bestCost) {
-                            bestCost = totalCost;
-                            bestNodeId = node.id;
-                            bestPos = pos;
-                        }
+                // Find the node object
+                for (Node node : instance.nodes) {
+                    if (node.id == nodeId) {
+                        filteredSelectedNodes.add(node);
+                        break;
                     }
                 }
             }
-
-            if (bestNodeId != -1) {
-                filteredCycle.add(bestPos, bestNodeId);
-                selectedIds.add(bestNodeId);
-            } else {
-                break;
-            }
         }
 
-        return buildSolutionFromCycle(instance, filteredCycle);
+        // Create partial solution
+        Solution partialSolution = buildSolutionFromCycle(instance, filteredCycle);
+
+        // Repair using LNS repair method (greedy-regret)
+        LargeNeighborhoodSearchSolver lnsSolver = new LargeNeighborhoodSearchSolver();
+        lnsSolver.repairWeighted(instance, partialSolution, 0.5, 0.5);
+
+        return partialSolution;
     }
 
     private Set<String> getEdges(List<Integer> cycle) {

@@ -359,7 +359,7 @@ public class LargeNeighborhoodSearchSolver extends LocalSearchCandidateMovesSolv
 //        sol.totalCost = totalCostCalc;
 //    }
 
-    private void repairWeighted(Instance instance, Solution sol, double weightRegret, double weightObjective) {
+    public void repairWeighted(Instance instance, Solution sol, double weightRegret, double weightObjective) {
         int targetSize = instance.nodes.size() / 2;
 
         Set<Integer> currentIds = new HashSet<>(sol.cycle);

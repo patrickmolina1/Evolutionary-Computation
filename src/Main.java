@@ -18,7 +18,7 @@ public class Main {
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
-            List<ExperimentResult> results = runner.runExperiments(instance, 5, 500);
+            List<ExperimentResult> results = runner.runExperiments(instance, 20, 49348);
 
             // Export results to CSV
             System.out.println("Exporting results...");
