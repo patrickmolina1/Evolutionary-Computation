@@ -21,6 +21,7 @@ public class HybridEvolutionarySolver extends Solver {
 
     public Solution hybridEvolutionary(Instance instance, long timeLimitMs, RecombinationOperator operator, boolean useLocalSearchAfterRecombination) {
         long startTime = System.currentTimeMillis();
+        int numLs = 0;
 
         // Initialize population
         List<Solution> population = initializePopulation(instance);
@@ -43,6 +44,7 @@ public class HybridEvolutionarySolver extends Solver {
             // Apply local search to offspring
             if (useLocalSearchAfterRecombination) {
                 offspring = applyLocalSearch(instance, offspring);
+                numLs++;
             }
 
             // Add to population if unique and better than worst
@@ -62,6 +64,7 @@ public class HybridEvolutionarySolver extends Solver {
 
         int totalTime = (int) (System.currentTimeMillis() - startTime);
         bestSolution.totalRunningTime = totalTime;
+        bestSolution.iterations = numLs;
         return bestSolution;
     }
 

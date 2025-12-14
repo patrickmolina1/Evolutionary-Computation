@@ -26,9 +26,11 @@ public class HybridEvolutionaryExperimentRunner extends ExperimentRunner impleme
 
     public ExperimentResult testMethod(Instance instance, String methodName, int numIterations, long timeLimitMs,
                                        RecombinationOperator operator, boolean useLS) {
+        System.out.println("Running " + methodName);
         List<Solution> solutions = new ArrayList<>();
 
         for (int i = 0; i < numIterations; i++) {
+            System.out.println("  Iteration " + (i + 1) + "/" + numIterations);
             Solution solution = solver.hybridEvolutionary(instance, timeLimitMs, operator, useLS);
             if (solution != null) {
                 solutions.add(solution);
