@@ -1,54 +1,45 @@
+import HybridEvolutionary.HybridEvolutionaryExperimentRunner;
 
-import GlobalConvexity.GlobalConvexityExperimentRunner;
-import GreedyHeuristics.GreedyHeuristicsExperimentRunner;
-import GreedyHeuristics.GreedyHeuristicsSolver;
-import GreedyRegretHeuristics.GreedyRegretHeuristicsExperimentRunner;
-import LocalSearch.DeltaLocalSearch.DeltaLocalSearchExperimentRunner;
-import LocalSearch.LocalSearchCandidateMoves.LocalSearchCandidateMovesExperimentRunner;
-import LocalSearch.LocalSearchExperimentRunner;
-import Utilities.ExperimentRunner;
-import Utilities.*;
-
+import Utilities.ExperimentResult;
+import Utilities.Instance;
+import java.io.IOException;
 import java.util.List;
 
+
+
 public class Main {
-    public static void main(String[] args) {
 
-
-
+    public static void main(String[] args) throws IOException {
         try {
             Instance instance = new Instance("./raw_data/TSPA.csv", "TSPA");
 
             // Create experiment runner
-
-            long startTime = System.currentTimeMillis();
-
-            GlobalConvexityExperimentRunner runner = new GlobalConvexityExperimentRunner();
+            HybridEvolutionaryExperimentRunner runner = new HybridEvolutionaryExperimentRunner();
 
             // Run experiments (e.g., 100 iterations per method)
             System.out.println("Running experiments...");
-            List<ExperimentResult> results = runner.runExperiments(instance, 1000);
+            List<ExperimentResult> results = runner.runExperiments(instance, 20, 49348);
 
             // Export results to CSV
             System.out.println("Exporting results...");
+
             // ensure output directory exists
-            java.io.File outDir = new java.io.File("src/Results/GlobalConvexity/" + instance.name);
+            java.io.File outDir = new java.io.File("src/Results/HybridEvolutionary/" + instance.name);
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
             runner.exportResults(results, outDir.getPath());
-
             System.out.println("Experiments completed successfully!");
 
             // Print summary
             for (ExperimentResult result : results) {
-                System.out.printf("%s - Min: %d, Max: %d, Avg: %.2f, RunningTime: %.2f\n",
-                        result.methodName, result.minCost, result.maxCost, result.avgCost, result.avgRunningTime);
+                System.out.printf("%s - Min: %d, Max: %d, Avg: %.2f\n",
+                        result.methodName, result.minCost, result.maxCost, result.avgCost);
             }
-            long endTime = System.currentTimeMillis();
-            System.out.println("Total Execution Time: " + (endTime - startTime));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }
