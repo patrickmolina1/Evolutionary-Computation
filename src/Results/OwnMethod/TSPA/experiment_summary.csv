@@ -1,0 +1,2 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,MinIterations,MaxIterations,AvgIterations,NumSolutions,BestSolutionID
+TSPA,OwnMethod,59020,70133,68333.15,46757,47392,46936.55,0,0,0.00,20,17

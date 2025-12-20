@@ -517,7 +517,7 @@ public class LargeNeighborhoodSearchSolver extends LocalSearchCandidateMovesSolv
         return partialSol;
     }
 
-    private Solution destroyHybrid(Instance instance, Solution sol) {
+    public Solution destroyHybrid(Instance instance, Solution sol) {
         Random rand = new Random();
         double strategy = rand.nextDouble();
 

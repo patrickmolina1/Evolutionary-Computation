@@ -1,0 +1,2 @@
+Instance,Method,MinCost,MaxCost,AvgCost,MinTime,MaxTime,AvgTime,MinIterations,MaxIterations,AvgIterations,NumSolutions,BestSolutionID
+TSPB,OwnMethod,43600,44330,43830.70,46760,47282,46952.20,0,0,0.00,20,15
